@@ -37,9 +37,11 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 import org.gwtbootstrap3.client.shared.event.HideEvent;
 import org.gwtbootstrap3.client.shared.event.HideHandler;
 import org.gwtbootstrap3.client.shared.event.ShowHandler;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.HasId;
 import org.gwtbootstrap3.client.ui.base.HasPlaceholder;
 import org.gwtbootstrap3.client.ui.base.HasResponsiveness;
+import org.gwtbootstrap3.client.ui.base.ValueBoxBase;
 import org.gwtbootstrap3.client.ui.constants.DeviceSize;
 import org.gwtbootstrap3.extras.datepicker.client.ui.base.constants.DatePickerDayOfWeek;
 import org.gwtbootstrap3.extras.datepicker.client.ui.base.constants.DatePickerLanguage;
@@ -152,6 +154,34 @@ public class DatePicker extends Composite
 
     public void setContainer( final Widget container ) {
         datePicker.setContainer( container );
+    }
+
+    public Widget getContainer() {
+        return datePicker.getContainer();
+    }
+
+    public TextBox getTextBox() {
+        return datePicker.getTextBox();
+    }
+
+    public void setAlignment( final ValueBoxBase.TextAlignment align ) {
+        datePicker.setAlignment( align );
+    }
+
+    public void setReadOnly( final boolean readOnly ) {
+        datePicker.setReadOnly( readOnly );
+    }
+
+    public boolean isReadOnly() {
+        return datePicker.isReadOnly();
+    }
+
+    public void show() {
+        datePicker.show();
+    }
+
+    public void hide() {
+        datePicker.hide();
     }
 
     @Override

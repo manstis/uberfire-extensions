@@ -161,7 +161,7 @@ public class WiresCanvas extends Composite implements ShapesManager,
         shapesInCanvas.clear();
         panel.getViewport().setPixelSize( DEFAULT_SIZE_WIDTH,
                                           DEFAULT_SIZE_HEIGHT );
-        panel.getViewport().draw();
+        panel.getViewport().batch();
     }
 
     @Override

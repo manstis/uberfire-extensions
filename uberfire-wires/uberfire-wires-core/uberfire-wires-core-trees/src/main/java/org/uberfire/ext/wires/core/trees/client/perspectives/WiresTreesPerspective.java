@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.uberfire.ext.wires.core.trees.client.perspectives;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -31,7 +30,7 @@ import org.uberfire.workbench.model.impl.PartDefinitionImpl;
 import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
 
 /**
- * A Perspective for Wires Scratch Pad
+ * A Perspective for Wires Trees
  */
 @ApplicationScoped
 @WorkbenchPerspective(identifier = "WiresTreesPerspective")

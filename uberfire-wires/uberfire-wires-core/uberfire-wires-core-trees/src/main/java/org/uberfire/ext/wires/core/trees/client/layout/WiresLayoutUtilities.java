@@ -117,7 +117,7 @@ public class WiresLayoutUtilities {
                                        final Viewport viewport ) {
         viewport.setPixelSize( (int) canvasBounds.getWidth(),
                                (int) canvasBounds.getHeight() );
-        viewport.draw();
+        viewport.batch();
     }
 
 }
