@@ -36,6 +36,7 @@ import com.ait.lienzo.client.core.shape.Arrow;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.core.shape.Rectangle;
+import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.client.core.shape.Viewport;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
@@ -142,12 +143,68 @@ public class GridLayer extends Layer implements ISelectionManager,
         return this.state;
     }
 
+    @Override
+    public Shape<?> findShapeAtPoint( int x,
+                                      int y ) {
+        return null;
+    }
+
     /**
      * Schedule a draw with out additional command.
      */
     @Override
     public void draw() {
         draw( NOP_COMMAND );
+    }
+
+    public native void requestAnimationFrame( final Command command ) /*-{
+        var that = this;
+        $wnd.requestAnimationFrame(function () {
+            that.@org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer::doDraw(Lcom/google/gwt/user/client/Command;)(command);
+        });
+    }-*/;
+
+    public void doDraw( final Command command ) {
+        updateBounds();
+        updateConnectors();
+        GridLayer.super.draw();
+        command.execute();
+    }
+
+    private static final int PADDING = 0;
+
+    private void updateBounds() {
+        final Viewport viewport = GridLayer.this.getViewport();
+        Transform transform = viewport.getTransform();
+        if ( transform == null ) {
+            viewport.setTransform( transform = new Transform() );
+        }
+        final double x = ( PADDING - transform.getTranslateX() ) / transform.getScaleX();
+        final double y = ( PADDING - transform.getTranslateY() ) / transform.getScaleY();
+        bounds.setLocation( new Point2D( x,
+                                         y ) );
+        bounds.setHeight( ( viewport.getHeight() - PADDING * 2 ) / transform.getScaleX() );
+        bounds.setWidth( ( viewport.getWidth() - PADDING * 2 ) / transform.getScaleY() );
+        bounds.setStrokeWidth( 1.0 / transform.getScaleX() );
+    }
+
+    private void updateConnectors() {
+        for ( Map.Entry<GridWidgetConnector, Arrow> e : connectors.entrySet() ) {
+            final GridWidgetConnector connector = e.getKey();
+            final Arrow arrow = e.getValue();
+            final IGridColumn<?, ?> sourceColumn = connector.getSourceColumn();
+            final IGridColumn<?, ?> targetColumn = connector.getTargetColumn();
+            final IBaseGridWidget<?, ?, ?> sourceGridWidget = getLinkedGridWidget( sourceColumn );
+            final IBaseGridWidget<?, ?, ?> targetGridWidget = getLinkedGridWidget( targetColumn );
+            if ( connector.getDirection() == GridWidgetConnector.Direction.EAST_WEST ) {
+                arrow.setStart( new Point2D( sourceGridWidget.getX() + sourceGridWidget.getWidth() / 2,
+                                             arrow.getStart().getY() ) );
+            } else {
+                arrow.setEnd( new Point2D( targetGridWidget.getX() + targetGridWidget.getWidth(),
+                                           arrow.getEnd().getY() ) );
+            }
+        }
+
     }
 
     /**
@@ -159,51 +216,12 @@ public class GridLayer extends Layer implements ISelectionManager,
             isRedrawScheduled = true;
             Scheduler.get().scheduleFinally( new Command() {
 
-                //This is helpful when debugging rendering issues to set the bounds smaller than the Viewport
-                private static final int PADDING = 0;
-
                 @Override
                 public void execute() {
-                    updateBounds();
-                    updateConnectors();
-                    GridLayer.super.draw();
+                    requestAnimationFrame( command );
                     isRedrawScheduled = false;
-                    command.execute();
                 }
 
-                private void updateBounds() {
-                    final Viewport viewport = GridLayer.this.getViewport();
-                    Transform transform = viewport.getTransform();
-                    if ( transform == null ) {
-                        viewport.setTransform( transform = new Transform() );
-                    }
-                    final double x = ( PADDING - transform.getTranslateX() ) / transform.getScaleX();
-                    final double y = ( PADDING - transform.getTranslateY() ) / transform.getScaleY();
-                    bounds.setLocation( new Point2D( x,
-                                                     y ) );
-                    bounds.setHeight( ( viewport.getHeight() - PADDING * 2 ) / transform.getScaleX() );
-                    bounds.setWidth( ( viewport.getWidth() - PADDING * 2 ) / transform.getScaleY() );
-                    bounds.setStrokeWidth( 1.0 / transform.getScaleX() );
-                }
-
-                private void updateConnectors() {
-                    for ( Map.Entry<GridWidgetConnector, Arrow> e : connectors.entrySet() ) {
-                        final GridWidgetConnector connector = e.getKey();
-                        final Arrow arrow = e.getValue();
-                        final IGridColumn<?, ?> sourceColumn = connector.getSourceColumn();
-                        final IGridColumn<?, ?> targetColumn = connector.getTargetColumn();
-                        final IBaseGridWidget<?, ?, ?> sourceGridWidget = getLinkedGridWidget( sourceColumn );
-                        final IBaseGridWidget<?, ?, ?> targetGridWidget = getLinkedGridWidget( targetColumn );
-                        if ( connector.getDirection() == GridWidgetConnector.Direction.EAST_WEST ) {
-                            arrow.setStart( new Point2D( sourceGridWidget.getX() + sourceGridWidget.getWidth() / 2,
-                                                         arrow.getStart().getY() ) );
-                        } else {
-                            arrow.setEnd( new Point2D( targetGridWidget.getX() + targetGridWidget.getWidth(),
-                                                       arrow.getEnd().getY() ) );
-                        }
-                    }
-
-                }
             } );
         }
     }

@@ -130,6 +130,8 @@ public class GridWidgetMouseMoveHandler<W extends IBaseGridWidget<?, M, ?>, M ex
                     mediator.setEnabled( state.getActiveGridWidget() == null );
                 }
         }
+        event.getHumanInputEvent().stopPropagation();
+        event.getHumanInputEvent().preventDefault();
     }
 
     private void handleColumnResize( final NodeMouseMoveEvent event ) {

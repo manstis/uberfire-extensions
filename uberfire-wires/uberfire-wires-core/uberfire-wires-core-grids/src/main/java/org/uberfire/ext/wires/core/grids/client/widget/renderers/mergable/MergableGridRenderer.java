@@ -348,10 +348,12 @@ public class MergableGridRenderer implements IMergableGridRenderer {
                                                                                                          widget );
                                     final Group hc = column.renderCell( row,
                                                                         cellContext );
-                                    hc.setX( x )
-                                            .setY( y )
-                                            .setListening( false );
-                                    g.add( hc );
+                                    if(hc!=null) {
+                                        hc.setX( x )
+                                                .setY( y )
+                                                .setListening( false );
+                                        g.add( hc );
+                                    }
 
                                     //Skip remainder of merged block
                                     rowIndex = rowIndex + cell.getMergedCellCount() - 1;
@@ -381,10 +383,12 @@ public class MergableGridRenderer implements IMergableGridRenderer {
 
                                     final Group hc = column.renderCell( row,
                                                                         cellContext );
-                                    hc.setX( x )
-                                            .setY( _y )
-                                            .setListening( false );
-                                    g.add( hc );
+                                    if(hc!=null) {
+                                        hc.setX( x )
+                                                .setY( _y )
+                                                .setListening( false );
+                                        g.add( hc );
+                                    }
 
                                     //Skip remainder of merged block
                                     rowIndex = _rowIndex + _cell.getMergedCellCount() - 1;

@@ -23,7 +23,6 @@ import javax.enterprise.context.Dependent;
 
 import com.ait.lienzo.client.core.mediator.MousePanMediator;
 import com.ait.lienzo.client.core.shape.Group;
-import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.core.shape.Text;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
@@ -613,23 +612,6 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
     @Override
     public Set<IBaseGridWidget<?, ?, ?>> getGridWidgets() {
         return gridLayer.getGridWidgets();
-    }
-
-    private final TextHolder textHolder = new TextHolder();
-
-    private static class TextHolder extends Layer {
-
-        public TextHolder() {
-            final Text t = new Text( "a" )
-                    .setFillColor( ColorName.GREY )
-                    .setFontSize( 12 )
-                    .setFontFamily( "serif" )
-                    .setListening( false )
-                    .setTextBaseLine( TextBaseLine.MIDDLE )
-                    .setTextAlign( TextAlign.CENTER );
-            add( t );
-        }
-
     }
 
 }
