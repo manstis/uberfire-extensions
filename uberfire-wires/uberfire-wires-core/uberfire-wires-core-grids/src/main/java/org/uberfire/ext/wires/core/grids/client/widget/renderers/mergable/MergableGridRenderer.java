@@ -27,7 +27,7 @@ import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridRow;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridBodyRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridHeaderRenderContext;

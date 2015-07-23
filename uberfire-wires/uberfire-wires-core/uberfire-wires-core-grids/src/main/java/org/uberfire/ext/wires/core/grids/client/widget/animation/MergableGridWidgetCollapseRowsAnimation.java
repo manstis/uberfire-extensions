@@ -21,7 +21,7 @@ import com.ait.lienzo.client.core.animation.IAnimationCallback;
 import com.ait.lienzo.client.core.animation.IAnimationHandle;
 import com.ait.lienzo.client.core.animation.TimedAnimation;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridRow;
-import org.uberfire.ext.wires.core.grids.client.widget.mergable.MergableGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
 
 /**
  * An animation to collapse rows in a merged block. The cells in

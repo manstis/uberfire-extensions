@@ -15,7 +15,7 @@
  */
 package org.uberfire.ext.wires.core.grids.client.widget.context;
 
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * The context of a Grid's body during the rendering phase.

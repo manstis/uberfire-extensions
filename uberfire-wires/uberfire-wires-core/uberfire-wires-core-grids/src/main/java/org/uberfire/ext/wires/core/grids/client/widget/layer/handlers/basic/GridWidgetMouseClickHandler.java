@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.basic;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.basic;
 
-import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
-import org.uberfire.ext.wires.core.grids.client.widget.BaseGridWidgetMouseClickHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
-import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
 
 /**
  * MouseClickHandler for a Grid containing non-merged cells
  */
 public class GridWidgetMouseClickHandler extends BaseGridWidgetMouseClickHandler<GridWidget> {
 
-    public GridWidgetMouseClickHandler( final GridWidget gridWidget,
-                                        final ISelectionManager selectionManager,
-                                        final IGridRenderer<GridData> renderer ) {
-        super( gridWidget,
-               selectionManager,
-               renderer );
+    public GridWidgetMouseClickHandler( final ISelectionManager selectionManager ) {
+        super( selectionManager );
     }
 
 }

@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers;
 
+import java.util.Set;
+
+import com.ait.lienzo.client.core.event.INodeXYEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.types.Point2D;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
-import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
+import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * Base MouseClickHandler to handle clicks to either the GridWidgets Header or Body. This implementation
@@ -29,21 +33,16 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  */
 public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<?, ?, ?>> implements NodeMouseClickHandler {
 
-    protected W gridWidget;
     protected ISelectionManager selectionManager;
-    protected IGridRenderer<?> renderer;
 
-    public BaseGridWidgetMouseClickHandler( final W gridWidget,
-                                            final ISelectionManager selectionManager,
-                                            final IGridRenderer<?> renderer ) {
-        this.gridWidget = gridWidget;
+    public BaseGridWidgetMouseClickHandler( final ISelectionManager selectionManager ) {
         this.selectionManager = selectionManager;
-        this.renderer = renderer;
     }
 
     @Override
     public void onNodeMouseClick( final NodeMouseClickEvent event ) {
-        selectionManager.select( gridWidget.getModel() );
+        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        selectionManager.select( activeGridWidget );
         handleHeaderCellClick( event );
         handleBodyCellClick( event );
     }
@@ -54,23 +53,29 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
      * @param event
      */
     protected void handleHeaderCellClick( final NodeMouseClickEvent event ) {
+        //Get GridWidget relating to event
+        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        if ( activeGridWidget == null ) {
+            return;
+        }
+
         //Convert Canvas co-ordinate to Grid co-ordinate
-        final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+        final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( activeGridWidget,
                                                                              new Point2D( event.getX(),
                                                                                           event.getY() ) );
         final double x = ap.getX();
         final double y = ap.getY();
-        if ( x < 0 || x > gridWidget.getWidth() ) {
+        if ( x < 0 || x > activeGridWidget.getWidth() ) {
             return;
         }
-        if ( y < 0 || y > renderer.getHeaderHeight() ) {
+        if ( y < 0 || y > activeGridWidget.getRenderer().getHeaderHeight() ) {
             return;
         }
 
         //Get column index
         double offsetX = 0;
         IGridColumn<?, ?> column = null;
-        for ( IGridColumn<?, ?> gridColumn : gridWidget.getModel().getColumns() ) {
+        for ( IGridColumn<?, ?> gridColumn : activeGridWidget.getModel().getColumns() ) {
             if ( gridColumn.isVisible() ) {
                 if ( x > offsetX && x < offsetX + gridColumn.getWidth() ) {
                     column = gridColumn;
@@ -96,6 +101,26 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
      */
     protected void handleBodyCellClick( final NodeMouseClickEvent event ) {
         //Do nothing by default
+    }
+
+    protected IBaseGridWidget<?, ?, ?> getActiveGridWidget( final INodeXYEvent event ) {
+        final Set<IBaseGridWidget<?, ?, ?>> gridWidgets = selectionManager.getGridWidgets();
+        for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
+            final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+                                                                                 new Point2D( event.getX(),
+                                                                                              event.getY() ) );
+
+            final double ax = ap.getX();
+            final double ay = ap.getY();
+            if ( ax < 0 || ax > gridWidget.getWidth() ) {
+                continue;
+            }
+            if ( ay < 0 || ay > gridWidget.getHeight() ) {
+                continue;
+            }
+            return gridWidget;
+        }
+        return null;
     }
 
 }

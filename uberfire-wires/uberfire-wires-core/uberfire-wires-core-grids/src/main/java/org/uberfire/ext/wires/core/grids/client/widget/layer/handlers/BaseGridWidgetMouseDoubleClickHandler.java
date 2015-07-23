@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers;
 
 import java.util.List;
+import java.util.Set;
 
+import com.ait.lienzo.client.core.event.INodeXYEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDoubleClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDoubleClickHandler;
 import com.ait.lienzo.client.core.types.Point2D;
@@ -24,7 +26,9 @@ import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
 import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
+import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 
 /**
@@ -36,16 +40,10 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  */
 public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridWidget<?, M, ?>, M extends IGridData<?, ?, ?>> implements NodeMouseDoubleClickHandler {
 
-    protected W gridWidget;
     protected ISelectionManager selectionManager;
-    protected IGridRenderer<?> renderer;
 
-    public BaseGridWidgetMouseDoubleClickHandler( final W gridWidget,
-                                                  final ISelectionManager selectionManager,
-                                                  final IGridRenderer<?> renderer ) {
-        this.gridWidget = gridWidget;
+    public BaseGridWidgetMouseDoubleClickHandler( final ISelectionManager selectionManager ) {
         this.selectionManager = selectionManager;
-        this.renderer = renderer;
     }
 
     @Override
@@ -69,37 +67,44 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
      * @param event
      */
     protected void handleBodyCellDoubleClick( final NodeMouseDoubleClickEvent event ) {
+        //Get GridWidget relating to event
+        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        if ( activeGridWidget == null ) {
+            return;
+        }
+
         //Convert Canvas co-ordinate to Grid co-ordinate
-        final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+        final IGridRenderer<?> renderer = activeGridWidget.getRenderer();
+        final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( activeGridWidget,
                                                                              new Point2D( event.getX(),
                                                                                           event.getY() ) );
         final double x = ap.getX();
         final double y = ap.getY();
-        if ( x < 0 || x > gridWidget.getWidth() ) {
+        if ( x < 0 || x > activeGridWidget.getWidth() ) {
             return;
         }
-        if ( y < renderer.getHeaderHeight() || y > gridWidget.getHeight() ) {
+        if ( y < renderer.getHeaderHeight() || y > activeGridWidget.getHeight() ) {
             return;
         }
 
-        final M model = gridWidget.getModel();
+        final IGridData<?, ?, ?> activeGridModel = activeGridWidget.getModel();
 
         //Get row index
         IGridRow<?> row;
         int rowIndex = 0;
         double offsetY = y - renderer.getHeaderHeight();
-        while ( ( row = model.getRow( rowIndex ) ).getHeight() < offsetY ) {
+        while ( ( row = activeGridModel.getRow( rowIndex ) ).getHeight() < offsetY ) {
             offsetY = offsetY - row.getHeight();
             rowIndex++;
         }
-        if ( rowIndex < 0 || rowIndex > model.getRowCount() - 1 ) {
+        if ( rowIndex < 0 || rowIndex > activeGridModel.getRowCount() - 1 ) {
             return;
         }
 
         //Get column index
         int columnIndex = -1;
         double offsetX = 0;
-        final List<? extends IGridColumn<?, ?>> columns = model.getColumns();
+        final List<? extends IGridColumn<?, ?>> columns = activeGridModel.getColumns();
         for ( int idx = 0; idx < columns.size(); idx++ ) {
             final IGridColumn<?, ?> gridColumn = columns.get( idx );
             if ( gridColumn.isVisible() ) {
@@ -115,13 +120,13 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
             return;
         }
 
-        final double cellX = gridWidget.getX() + offsetX;
-        final double cellY = gridWidget.getY() + renderer.getHeaderHeight() + getRowOffset( rowIndex,
-                                                                                            columnIndex,
-                                                                                            model );
+        final double cellX = activeGridWidget.getX() + offsetX;
+        final double cellY = activeGridWidget.getY() + renderer.getHeaderHeight() + getRowOffset( rowIndex,
+                                                                                                  columnIndex,
+                                                                                                  activeGridModel );
         final double cellHeight = getCellHeight( rowIndex,
                                                  columnIndex,
-                                                 model );
+                                                 activeGridModel );
 
         final GridCellRenderContext context = new GridCellRenderContext( cellX,
                                                                          cellY,
@@ -129,7 +134,7 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
                                                                          cellHeight,
                                                                          rowIndex,
                                                                          columnIndex,
-                                                                         gridWidget );
+                                                                         activeGridWidget );
 
         onDoubleClick( context );
     }
@@ -139,23 +144,23 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
      * This may be different to the underlying model's {code}getRowOffset(){code} for merged cells.
      * @param rowIndex The index of the row on which the MouseDoubleClickEvent occurred.
      * @param columnIndex The index of the column in which the MouseDoubleClickEvent occurred.
-     * @param model The GridWidget's underlying Model
+     * @param activeGridModel The GridWidget's underlying Model
      * @return
      */
     protected abstract double getRowOffset( final int rowIndex,
                                             final int columnIndex,
-                                            final M model );
+                                            final IGridData<?, ?, ?> activeGridModel );
 
     /**
      * Get the height of a cell. This may be different to the row's height for merged cells.
      * @param rowIndex The index of the row on which the MouseDoubleClickEvent occurred.
      * @param columnIndex The index of the column in which the MouseDoubleClickEvent occurred.
-     * @param model The GridWidget's underlying Model
+     * @param activeGridModel The GridWidget's underlying Model
      * @return
      */
     protected abstract double getCellHeight( final int rowIndex,
                                              final int columnIndex,
-                                             final M model );
+                                             final IGridData<?, ?, ?> activeGridModel );
 
     /**
      * Signal a MouseDoubleClickEvent has occurred on a cell in the Body.
@@ -164,5 +169,25 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
      * @param context
      */
     protected abstract void onDoubleClick( final GridCellRenderContext context );
+
+    protected IBaseGridWidget<?, ?, ?> getActiveGridWidget( final INodeXYEvent event ) {
+        final Set<IBaseGridWidget<?, ?, ?>> gridWidgets = selectionManager.getGridWidgets();
+        for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
+            final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+                                                                                 new Point2D( event.getX(),
+                                                                                              event.getY() ) );
+
+            final double ax = ap.getX();
+            final double ay = ap.getY();
+            if ( ax < 0 || ax > gridWidget.getWidth() ) {
+                continue;
+            }
+            if ( ay < 0 || ay > gridWidget.getHeight() ) {
+                continue;
+            }
+            return gridWidget;
+        }
+        return null;
+    }
 
 }

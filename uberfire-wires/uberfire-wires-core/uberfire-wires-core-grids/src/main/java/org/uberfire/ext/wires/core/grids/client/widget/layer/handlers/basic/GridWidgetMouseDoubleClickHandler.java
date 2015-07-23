@@ -13,54 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.basic;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.basic;
 
 import org.uberfire.client.callbacks.Callback;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCellValue;
+import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridCell;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
-import org.uberfire.ext.wires.core.grids.client.widget.BaseGridWidgetMouseDoubleClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
-import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseDoubleClickHandler;
 
 /**
  * MouseDoubleClickHandler for a Grid containing non-mergable cells.
  */
 public class GridWidgetMouseDoubleClickHandler extends BaseGridWidgetMouseDoubleClickHandler<GridWidget, GridData> {
 
-    public GridWidgetMouseDoubleClickHandler( final GridWidget gridWidget,
-                                              final ISelectionManager selectionManager,
-                                              final IGridRenderer<GridData> renderer ) {
-        super( gridWidget,
-               selectionManager,
-               renderer );
+    public GridWidgetMouseDoubleClickHandler( final ISelectionManager selectionManager ) {
+        super( selectionManager );
     }
 
     @Override
     @SuppressWarnings("unused")
     protected double getRowOffset( final int rowIndex,
                                    final int columnIndex,
-                                   final GridData model ) {
-        return model.getRowOffset( rowIndex );
+                                   final IGridData<?, ?, ?> activeGridModel ) {
+        return activeGridModel.getRowOffset( rowIndex );
     }
 
     @Override
     @SuppressWarnings("unused")
     protected double getCellHeight( final int rowIndex,
                                     final int columnIndex,
-                                    final GridData model ) {
-        return model.getRow( rowIndex ).getHeight();
+                                    final IGridData<?, ?, ?> activeGridModel ) {
+        return activeGridModel.getRow( rowIndex ).getHeight();
     }
 
     @Override
     protected void onDoubleClick( final GridCellRenderContext context ) {
         final int rowIndex = context.getRowIndex();
         final int columnIndex = context.getColumnIndex();
-        final GridCell cell = gridWidget.getModel().getCell( rowIndex,
-                                                             columnIndex );
-        final GridColumn column = gridWidget.getModel().getColumns().get( columnIndex );
+        final GridWidget gridWidget = (GridWidget) context.getWidget();
+        final GridData gridModel = gridWidget.getModel();
+        final GridCell cell = gridModel.getCell( rowIndex,
+                                                 columnIndex );
+        final GridColumn column = gridModel.getColumns().get( columnIndex );
         column.edit( cell,
                      context,
                      new Callback<IGridCellValue<?>>() {

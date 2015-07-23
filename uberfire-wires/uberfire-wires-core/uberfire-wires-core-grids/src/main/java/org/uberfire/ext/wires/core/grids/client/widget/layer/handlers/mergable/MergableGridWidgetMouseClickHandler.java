@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.mergable;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable;
 
 import java.util.List;
 
@@ -24,11 +24,13 @@ import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridRow;
 import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
-import org.uberfire.ext.wires.core.grids.client.widget.BaseGridWidgetMouseClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.animation.MergableGridWidgetCollapseRowsAnimation;
 import org.uberfire.ext.wires.core.grids.client.widget.animation.MergableGridWidgetExpandRowsAnimation;
-import org.uberfire.ext.wires.core.grids.client.widget.renderers.mergable.IMergableGridRenderer;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 
 /**
  * MouseClickHandler for a Grid containing merged cells. Merge cells have an additional "widget" that
@@ -36,17 +38,24 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.mergable.IMerga
  */
 public class MergableGridWidgetMouseClickHandler extends BaseGridWidgetMouseClickHandler<MergableGridWidget> {
 
-    public MergableGridWidgetMouseClickHandler( final MergableGridWidget gridWidget,
-                                                final ISelectionManager selectionManager,
-                                                final IMergableGridRenderer renderer ) {
-        super( gridWidget,
-               selectionManager,
-               renderer );
+    public MergableGridWidgetMouseClickHandler( final ISelectionManager selectionManager ) {
+        super( selectionManager );
     }
 
     @Override
     protected void handleBodyCellClick( final NodeMouseClickEvent event ) {
+        //Get GridWidget relating to event
+        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        if ( activeGridWidget == null ) {
+            return;
+        }
+        if ( !( activeGridWidget instanceof MergableGridWidget ) ) {
+            return;
+        }
+        final MergableGridWidget gridWidget = (MergableGridWidget) activeGridWidget;
+
         //Convert Canvas co-ordinate to Grid co-ordinate
+        final IGridRenderer<?> renderer = gridWidget.getRenderer();
         final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
                                                                              new Point2D( event.getX(),
                                                                                           event.getY() ) );
@@ -116,17 +125,20 @@ public class MergableGridWidgetMouseClickHandler extends BaseGridWidgetMouseClic
 
         //Collapse or expand rows as needed
         if ( !nextRowCell.isCollapsed() ) {
-            collapseRows( rowIndex,
+            collapseRows( gridWidget,
+                          rowIndex,
                           cell.getMergedCellCount(),
                           columnIndex );
         } else {
-            expandRows( rowIndex,
+            expandRows( gridWidget,
+                        rowIndex,
                         cell.getMergedCellCount(),
                         columnIndex );
         }
     }
 
-    protected void collapseRows( final int rowIndex,
+    protected void collapseRows( final MergableGridWidget gridWidget,
+                                 final int rowIndex,
                                  final int rowCount,
                                  final int columnIndex ) {
         final MergableGridWidgetCollapseRowsAnimation a = new MergableGridWidgetCollapseRowsAnimation( gridWidget,
@@ -136,7 +148,8 @@ public class MergableGridWidgetMouseClickHandler extends BaseGridWidgetMouseClic
         a.run();
     }
 
-    protected void expandRows( final int rowIndex,
+    protected void expandRows( final MergableGridWidget gridWidget,
+                               final int rowIndex,
                                final int rowCount,
                                final int columnIndex ) {
         final MergableGridWidgetExpandRowsAnimation a = new MergableGridWidgetExpandRowsAnimation( gridWidget,

@@ -15,13 +15,18 @@
  */
 package org.uberfire.ext.wires.core.grids.client.widget;
 
+import java.util.Set;
+
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 public interface ISelectionManager {
 
-    void select( final IGridData<?, ?, ?> selectable );
+    void select( final IBaseGridWidget<?, ?, ?> gridWidget );
 
     void selectLinkedColumn( final IGridColumn<?, ?> link );
+
+    Set<IBaseGridWidget<?, ?, ?>> getGridWidgets();
 
 }

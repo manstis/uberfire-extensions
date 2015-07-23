@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget;
+package org.uberfire.ext.wires.core.grids.client.widget.grid;
 
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.shape.IPrimitive;
@@ -26,8 +26,7 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  * @param <M> The Model backing the GridWidget.
  * @param <R> The Renderer to be used to render the GridWidget.
  */
-public interface IBaseGridWidget<C extends Node<C>, M extends IGridData<?, ?, ?>, R extends IGridRenderer<M>> extends IPrimitive<C>,
-                                                                                                                      NodeMouseClickHandler {
+public interface IBaseGridWidget<C extends Node<C>, M extends IGridData<?, ?, ?>, R extends IGridRenderer<M>> extends IPrimitive<C> {
 
     /**
      * Get the Model backing the Widget.

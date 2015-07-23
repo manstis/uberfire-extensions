@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.dnd;
-
-import java.util.Map;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 
 import com.ait.lienzo.client.core.event.NodeMouseUpEvent;
 import com.ait.lienzo.client.core.event.NodeMouseUpHandler;
 import com.google.gwt.dom.client.Style;
-import org.uberfire.ext.wires.core.grids.client.model.IGridData;
-import org.uberfire.ext.wires.core.grids.client.widget.GridLayer;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 
 /**
  * MouseUpHandler to handle completion of drag operations and release resources.
@@ -31,14 +27,11 @@ public class GridWidgetMouseUpHandler implements NodeMouseUpHandler {
 
     private final GridLayer layer;
     private final GridWidgetHandlersState state;
-    private final Map<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> selectables;
 
     public GridWidgetMouseUpHandler( final GridLayer layer,
-                                     final GridWidgetHandlersState state,
-                                     final Map<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> selectables ) {
+                                     final GridWidgetHandlersState state ) {
         this.layer = layer;
         this.state = state;
-        this.selectables = selectables;
     }
 
     @Override
@@ -56,8 +49,8 @@ public class GridWidgetMouseUpHandler implements NodeMouseUpHandler {
         }
 
         //Reset state
-        state.setGrid( null );
-        state.setGridColumn( null );
+        state.setActiveGridWidget( null );
+        state.setActiveGridColumn( null );
         state.setOperation( GridWidgetHandlersState.GridWidgetHandlersOperation.NONE );
         state.setCursor( Style.Cursor.DEFAULT );
         layer.getViewport().getElement().getStyle().setCursor( state.getCursor() );

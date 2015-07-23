@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.basic;
+package org.uberfire.ext.wires.core.grids.client.widget.grid.basic;
 
-import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
-import org.uberfire.ext.wires.core.grids.client.widget.BaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.BaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 
@@ -26,30 +25,12 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  */
 public class GridWidget extends BaseGridWidget<GridData, IGridRenderer<GridData>> {
 
-    private final GridWidgetMouseClickHandler mouseClickHandler;
-    private final GridWidgetMouseDoubleClickHandler mouseDoubleClickHandler;
-
     public GridWidget( final GridData model,
                        final ISelectionManager selectionManager,
                        final IGridRenderer<GridData> renderer ) {
         super( model,
                selectionManager,
                renderer );
-
-        //Click handlers
-        mouseClickHandler = new GridWidgetMouseClickHandler( this,
-                                                             selectionManager,
-                                                             renderer );
-        mouseDoubleClickHandler = new GridWidgetMouseDoubleClickHandler( this,
-                                                                         selectionManager,
-                                                                         renderer );
-        addNodeMouseClickHandler( mouseClickHandler );
-        addNodeMouseDoubleClickHandler( mouseDoubleClickHandler );
-    }
-
-    @Override
-    public void onNodeMouseClick( final NodeMouseClickEvent event ) {
-        mouseClickHandler.onNodeMouseClick( event );
     }
 
 }

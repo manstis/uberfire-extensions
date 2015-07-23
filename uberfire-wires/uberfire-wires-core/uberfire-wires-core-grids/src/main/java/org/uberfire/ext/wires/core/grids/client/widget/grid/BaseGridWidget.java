@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget;
+package org.uberfire.ext.wires.core.grids.client.widget.grid;
 
 import java.util.List;
 
@@ -27,8 +27,10 @@ import com.ait.lienzo.client.core.types.ClipRegion;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
+import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridBodyRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridHeaderRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 
 /**
@@ -36,8 +38,7 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  * @param <M> The Model backing the GridWidget.
  * @param <R> The Renderer to be used to render the GridWidget.
  */
-public abstract class BaseGridWidget<M extends IGridData<?, ?, ?>, R extends IGridRenderer<M>> extends Group implements IBaseGridWidget<Group, M, R>,
-                                                                                                                        NodeMouseClickHandler {
+public abstract class BaseGridWidget<M extends IGridData<?, ?, ?>, R extends IGridRenderer<M>> extends Group implements IBaseGridWidget<Group, M, R> {
 
     private boolean isSelected = false;
     private Group selection = null;

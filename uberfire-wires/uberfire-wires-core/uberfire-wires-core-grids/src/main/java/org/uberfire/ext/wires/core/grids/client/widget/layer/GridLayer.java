@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget;
+package org.uberfire.ext.wires.core.grids.client.widget.layer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ait.lienzo.client.core.event.NodeMouseDownEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDownHandler;
@@ -40,13 +43,18 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Command;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.widget.GridWidgetConnector;
+import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.animation.GridWidgetScrollIntoViewAnimation;
-import org.uberfire.ext.wires.core.grids.client.widget.dnd.GridWidgetHandlersState;
-import org.uberfire.ext.wires.core.grids.client.widget.dnd.GridWidgetMouseDownHandler;
-import org.uberfire.ext.wires.core.grids.client.widget.dnd.GridWidgetMouseMoveHandler;
-import org.uberfire.ext.wires.core.grids.client.widget.dnd.GridWidgetMouseUpHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseDoubleClickHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetHandlersState;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetMouseDownHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetMouseMoveHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetMouseUpHandler;
 
-//import org.uberfire.ext.wires.core.grids.client.widget.basic.GridWidget;
+//import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
 
 /**
  * A specialised Layer that supports pass-through of MouseEvents from DOMElements to GridWidgets.
@@ -59,7 +67,7 @@ public class GridLayer extends Layer implements ISelectionManager,
                                                 NodeMouseMoveHandler,
                                                 NodeMouseUpHandler {
 
-    private Map<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> selectables = new HashMap<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>>();
+    private Set<IBaseGridWidget<?, ?, ?>> gridWidgets = new HashSet<IBaseGridWidget<?, ?, ?>>();
     private Map<GridWidgetConnector, Arrow> connectors = new HashMap<GridWidgetConnector, Arrow>();
 
     private Rectangle bounds;
@@ -68,6 +76,10 @@ public class GridLayer extends Layer implements ISelectionManager,
     private final GridWidgetMouseDownHandler mouseDownHandler;
     private final GridWidgetMouseMoveHandler mouseMoveHandler;
     private final GridWidgetMouseUpHandler mouseUpHandler;
+
+    private final BaseGridWidgetMouseClickHandler<? extends IBaseGridWidget<?, ?, ?>> mouseClickHandler;
+    private final BaseGridWidgetMouseDoubleClickHandler<? extends IBaseGridWidget<?, ?, ?>, ? extends IGridData<?, ?, ?>> mouseDoubleClickHandler;
+
     private final GridWidgetHandlersState state = new GridWidgetHandlersState();
 
     private static final Command NOP_COMMAND = new Command() {
@@ -77,21 +89,23 @@ public class GridLayer extends Layer implements ISelectionManager,
         }
     };
 
-    public GridLayer() {
-        bounds = new Rectangle( 0, 0 )
-                .setVisible( false );
+    public GridLayer( final BaseGridWidgetMouseClickHandler<? extends IBaseGridWidget<?, ?, ?>> mouseClickHandler,
+                      final BaseGridWidgetMouseDoubleClickHandler<? extends IBaseGridWidget<?, ?, ?>, ? extends IGridData<?, ?, ?>> mouseDoubleClickHandler ) {
+        bounds = new Rectangle( 0, 0 ).setVisible( false );
         add( bounds );
 
-        //Column DnD handlers
-        mouseDownHandler = new GridWidgetMouseDownHandler( this,
-                                                           state,
-                                                           selectables );
-        mouseMoveHandler = new GridWidgetMouseMoveHandler( this,
-                                                           state,
-                                                           selectables );
-        mouseUpHandler = new GridWidgetMouseUpHandler( this,
-                                                       state,
-                                                       selectables );
+        //Mouse handlers
+        this.mouseClickHandler = mouseClickHandler;
+        this.mouseDoubleClickHandler = mouseDoubleClickHandler;
+
+        this.mouseDownHandler = new GridWidgetMouseDownHandler( this,
+                                                                state );
+        this.mouseMoveHandler = new GridWidgetMouseMoveHandler( this,
+                                                                state );
+        this.mouseUpHandler = new GridWidgetMouseUpHandler( this,
+                                                            state );
+        addNodeMouseClickHandler( mouseClickHandler );
+        addNodeMouseDoubleClickHandler( mouseDoubleClickHandler );
         addNodeMouseDownHandler( mouseDownHandler );
         addNodeMouseMoveHandler( mouseMoveHandler );
         addNodeMouseUpHandler( mouseUpHandler );
@@ -166,13 +180,13 @@ public class GridLayer extends Layer implements ISelectionManager,
                         final Arrow arrow = e.getValue();
                         final IGridColumn<?, ?> sourceColumn = connector.getSourceColumn();
                         final IGridColumn<?, ?> targetColumn = connector.getTargetColumn();
-                        final IBaseGridWidget<?, ?, ?> sourceGrid = getLinkedGrid( sourceColumn );
-                        final IBaseGridWidget<?, ?, ?> targetGrid = getLinkedGrid( targetColumn );
+                        final IBaseGridWidget<?, ?, ?> sourceGridWidget = getLinkedGridWidget( sourceColumn );
+                        final IBaseGridWidget<?, ?, ?> targetGridWidget = getLinkedGridWidget( targetColumn );
                         if ( connector.getDirection() == GridWidgetConnector.Direction.EAST_WEST ) {
-                            arrow.setStart( new Point2D( sourceGrid.getX() + sourceGrid.getWidth() / 2,
+                            arrow.setStart( new Point2D( sourceGridWidget.getX() + sourceGridWidget.getWidth() / 2,
                                                          arrow.getStart().getY() ) );
                         } else {
-                            arrow.setEnd( new Point2D( targetGrid.getX() + targetGrid.getWidth(),
+                            arrow.setEnd( new Point2D( targetGridWidget.getX() + targetGridWidget.getWidth(),
                                                        arrow.getEnd().getY() ) );
                         }
                     }
@@ -190,11 +204,11 @@ public class GridLayer extends Layer implements ISelectionManager,
      */
     @Override
     public Layer add( final IPrimitive<?> child ) {
-        addSelectable( child );
+        addGridWidget( child );
         return super.add( child );
     }
 
-    private void addSelectable( final IPrimitive<?> child,
+    private void addGridWidget( final IPrimitive<?> child,
                                 final IPrimitive<?>... children ) {
         final List<IPrimitive<?>> all = new ArrayList<IPrimitive<?>>();
         all.add( child );
@@ -202,37 +216,37 @@ public class GridLayer extends Layer implements ISelectionManager,
         for ( IPrimitive<?> c : all ) {
             if ( c instanceof IBaseGridWidget<?, ?, ?> ) {
                 final IBaseGridWidget<?, ?, ?> gridWidget = (IBaseGridWidget<?, ?, ?>) c;
-                selectables.put( gridWidget.getModel(),
-                                 gridWidget );
-                addConnectors();
+                gridWidgets.add( gridWidget );
+                addGridWidgetConnectors();
             }
         }
     }
 
-    private void addConnectors() {
-        for ( Map.Entry<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> e1 : selectables.entrySet() ) {
-            for ( IGridColumn<?, ?> c : e1.getKey().getColumns() ) {
-                if ( c.isVisible() ) {
-                    if ( c.isLinked() ) {
-                        final IBaseGridWidget<?, ?, ?> linkWidget = getLinkedGrid( c.getLink() );
+    private void addGridWidgetConnectors() {
+        for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
+            final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
+            for ( IGridColumn<?, ?> gridColumn : gridModel.getColumns() ) {
+                if ( gridColumn.isVisible() ) {
+                    if ( gridColumn.isLinked() ) {
+                        final IBaseGridWidget<?, ?, ?> linkWidget = getLinkedGridWidget( gridColumn.getLink() );
                         if ( linkWidget != null ) {
                             GridWidgetConnector.Direction direction;
-                            final Point2D sp = new Point2D( e1.getValue().getX() + e1.getValue().getWidth() / 2,
-                                                            e1.getValue().getY() + e1.getValue().getHeight() / 2 );
+                            final Point2D sp = new Point2D( gridWidget.getX() + gridWidget.getWidth() / 2,
+                                                            gridWidget.getY() + gridWidget.getHeight() / 2 );
                             final Point2D ep = new Point2D( linkWidget.getX() + linkWidget.getWidth() / 2,
                                                             linkWidget.getY() + linkWidget.getHeight() / 2 );
                             if ( sp.getX() < ep.getX() ) {
                                 direction = GridWidgetConnector.Direction.EAST_WEST;
-                                sp.setX( sp.getX() + e1.getValue().getWidth() / 2 );
+                                sp.setX( sp.getX() + gridWidget.getWidth() / 2 );
                                 ep.setX( ep.getX() - linkWidget.getWidth() / 2 );
                             } else {
                                 direction = GridWidgetConnector.Direction.WEST_EAST;
-                                sp.setX( sp.getX() - e1.getValue().getWidth() / 2 );
+                                sp.setX( sp.getX() - gridWidget.getWidth() / 2 );
                                 ep.setX( ep.getX() + linkWidget.getWidth() / 2 );
                             }
 
-                            final GridWidgetConnector connector = new GridWidgetConnector( c,
-                                                                                           c.getLink(),
+                            final GridWidgetConnector connector = new GridWidgetConnector( gridColumn,
+                                                                                           gridColumn.getLink(),
                                                                                            direction );
 
                             if ( !connectors.containsKey( connector ) ) {
@@ -258,15 +272,16 @@ public class GridLayer extends Layer implements ISelectionManager,
         }
     }
 
-    private IBaseGridWidget<?, ?, ?> getLinkedGrid( final IGridColumn<?, ?> link ) {
-        IBaseGridWidget<?, ?, ?> gridWidget = null;
-        for ( Map.Entry<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> e : selectables.entrySet() ) {
-            if ( e.getKey().getColumns().contains( link ) ) {
-                gridWidget = e.getValue();
+    private IBaseGridWidget<?, ?, ?> getLinkedGridWidget( final IGridColumn<?, ?> link ) {
+        IBaseGridWidget<?, ?, ?> linkedGridWidget = null;
+        for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
+            final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
+            if ( gridModel.getColumns().contains( link ) ) {
+                linkedGridWidget = gridWidget;
                 break;
             }
         }
-        return gridWidget;
+        return linkedGridWidget;
     }
 
     /**
@@ -278,7 +293,7 @@ public class GridLayer extends Layer implements ISelectionManager,
     @Override
     public Layer add( final IPrimitive<?> child,
                       final IPrimitive<?>... children ) {
-        addSelectable( child,
+        addGridWidget( child,
                        children );
         return super.add( child,
                           children );
@@ -293,11 +308,11 @@ public class GridLayer extends Layer implements ISelectionManager,
      */
     @Override
     public Layer remove( final IPrimitive<?> child ) {
-        removeSelectable( child );
+        removeGridWidget( child );
         return super.remove( child );
     }
 
-    private void removeSelectable( final IPrimitive<?> child,
+    private void removeGridWidget( final IPrimitive<?> child,
                                    final IPrimitive<?>... children ) {
         final List<IPrimitive<?>> all = new ArrayList<IPrimitive<?>>();
         all.add( child );
@@ -305,16 +320,17 @@ public class GridLayer extends Layer implements ISelectionManager,
         for ( IPrimitive<?> c : all ) {
             if ( c instanceof IBaseGridWidget<?, ?, ?> ) {
                 final IBaseGridWidget<?, ?, ?> gridWidget = (IBaseGridWidget<?, ?, ?>) c;
-                selectables.remove( gridWidget.getModel() );
-                removeConnectors( gridWidget.getModel() );
+                gridWidgets.remove( gridWidget );
+                removeGridWidgetConnectors( gridWidget );
             }
         }
     }
 
-    private void removeConnectors( final IGridData<?, ?, ?> model ) {
+    private void removeGridWidgetConnectors( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
         final List<GridWidgetConnector> removedConnectors = new ArrayList<GridWidgetConnector>();
         for ( Map.Entry<GridWidgetConnector, Arrow> e : connectors.entrySet() ) {
-            if ( model.getColumns().contains( e.getKey().getSourceColumn() ) || model.getColumns().contains( e.getKey().getTargetColumn() ) ) {
+            if ( gridModel.getColumns().contains( e.getKey().getSourceColumn() ) || gridModel.getColumns().contains( e.getKey().getTargetColumn() ) ) {
                 remove( e.getValue() );
                 removedConnectors.add( e.getKey() );
             }
@@ -327,24 +343,24 @@ public class GridLayer extends Layer implements ISelectionManager,
 
     @Override
     public Layer removeAll() {
-        selectables.clear();
+        gridWidgets.clear();
         return super.removeAll();
     }
 
     @Override
-    public void select( final IGridData<?, ?, ?> selectable ) {
-        for ( Map.Entry<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> e : selectables.entrySet() ) {
-            e.getValue().deselect();
-        }
-        if ( selectables.containsKey( selectable ) ) {
-            selectables.get( selectable ).select();
+    public void select( final IBaseGridWidget<?, ?, ?> selectedGridWidget ) {
+        for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
+            gridWidget.deselect();
+            if ( gridWidget.equals( selectedGridWidget ) ) {
+                selectedGridWidget.select();
+            }
         }
         draw();
     }
 
     @Override
     public void selectLinkedColumn( final IGridColumn<?, ?> link ) {
-        final IBaseGridWidget<?, ?, ?> gridWidget = getLinkedGrid( link );
+        final IBaseGridWidget<?, ?, ?> gridWidget = getLinkedGridWidget( link );
         if ( gridWidget == null ) {
             return;
         }
@@ -353,10 +369,15 @@ public class GridLayer extends Layer implements ISelectionManager,
                                                                                            new Command() {
                                                                                                @Override
                                                                                                public void execute() {
-                                                                                                   select( gridWidget.getModel() );
+                                                                                                   select( gridWidget );
                                                                                                }
                                                                                            } );
         a.run();
+    }
+
+    @Override
+    public Set<IBaseGridWidget<?, ?, ?>> getGridWidgets() {
+        return Collections.unmodifiableSet( gridWidgets );
     }
 
     public Rectangle getVisibleBounds() {

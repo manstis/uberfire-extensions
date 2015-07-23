@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.mergable;
+package org.uberfire.ext.wires.core.grids.client.widget.grid.mergable;
 
-import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
-import org.uberfire.ext.wires.core.grids.client.widget.BaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.BaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.mergable.IMergableGridRenderer;
 
@@ -26,9 +25,6 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.mergable.IMerga
  */
 public class MergableGridWidget extends BaseGridWidget<MergableGridData, IMergableGridRenderer> {
 
-    private final MergableGridWidgetMouseClickHandler mouseClickHandler;
-    private final MergableGridWidgetMouseDoubleClickHandler mouseDoubleClickHandler;
-
     public MergableGridWidget( final MergableGridData model,
                                final ISelectionManager selectionManager,
                                final IMergableGridRenderer renderer ) {
@@ -36,15 +32,6 @@ public class MergableGridWidget extends BaseGridWidget<MergableGridData, IMergab
                selectionManager,
                renderer );
 
-        //Click handlers
-        mouseClickHandler = new MergableGridWidgetMouseClickHandler( this,
-                                                                     selectionManager,
-                                                                     renderer );
-        mouseDoubleClickHandler = new MergableGridWidgetMouseDoubleClickHandler( this,
-                                                                                 selectionManager,
-                                                                                 renderer );
-        addNodeMouseClickHandler( mouseClickHandler );
-        addNodeMouseDoubleClickHandler( mouseDoubleClickHandler );
     }
 
     public boolean onGroupingToggle( final double cellX,
@@ -55,11 +42,6 @@ public class MergableGridWidget extends BaseGridWidget<MergableGridData, IMergab
                                           cellY,
                                           columnWidth,
                                           rowHeight );
-    }
-
-    @Override
-    public void onNodeMouseClick( final NodeMouseClickEvent event ) {
-        mouseClickHandler.onNodeMouseClick( event );
     }
 
 }

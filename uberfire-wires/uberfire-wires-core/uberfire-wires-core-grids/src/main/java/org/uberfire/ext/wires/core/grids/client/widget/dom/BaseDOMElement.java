@@ -34,8 +34,8 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
-import org.uberfire.ext.wires.core.grids.client.widget.GridLayer;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
 
 /**

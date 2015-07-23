@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.dnd;
-
-import java.util.Map;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 
 import com.ait.lienzo.client.core.event.NodeMouseDownEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDownHandler;
@@ -24,8 +22,8 @@ import com.ait.lienzo.client.core.types.Point2D;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
-import org.uberfire.ext.wires.core.grids.client.widget.GridLayer;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 
 /**
  * MouseDownHandler to handle the commencement of drag operations.
@@ -34,26 +32,24 @@ public class GridWidgetMouseDownHandler implements NodeMouseDownHandler {
 
     private final GridLayer layer;
     private final GridWidgetHandlersState state;
-    private final Map<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> selectables;
 
     public GridWidgetMouseDownHandler( final GridLayer layer,
-                                       final GridWidgetHandlersState state,
-                                       final Map<IGridData<?, ?, ?>, IBaseGridWidget<?, ?, ?>> selectables ) {
+                                       final GridWidgetHandlersState state ) {
         this.layer = layer;
         this.state = state;
-        this.selectables = selectables;
     }
 
     @Override
     public void onNodeMouseDown( final NodeMouseDownEvent event ) {
         //The Grid that the pointer is currently over is set by the MouseMoveHandler
-        if ( state.getGrid() == null || state.getGridColumn() == null ) {
+        if ( state.getActiveGridWidget() == null || state.getActiveGridColumn() == null ) {
             return;
         }
 
         //Get the GridWidget for the grid.
-        final IBaseGridWidget<?, ?, ?> gridWidget = selectables.get( state.getGrid() );
-        final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+        final IGridColumn<?, ?> activeGridColumn = state.getActiveGridColumn();
+        final IBaseGridWidget<?, ?, ?> activeGridWidget = state.getActiveGridWidget();
+        final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( activeGridWidget,
                                                                              new Point2D( event.getX(),
                                                                                           event.getY() ) );
 
@@ -61,24 +57,25 @@ public class GridWidgetMouseDownHandler implements NodeMouseDownHandler {
         switch ( state.getOperation() ) {
             case COLUMN_RESIZE_PENDING:
                 state.setEventInitialX( ap.getX() );
-                state.setEventInitialColumnWidth( state.getGridColumn().getWidth() );
+                state.setEventInitialColumnWidth( activeGridColumn.getWidth() );
                 state.setOperation( GridWidgetHandlersState.GridWidgetHandlersOperation.COLUMN_RESIZE );
                 break;
 
             case COLUMN_MOVE_PENDING:
-                showColumnHighlight( state.getGrid(),
-                                     state.getGridColumn() );
+                showColumnHighlight( activeGridWidget,
+                                     activeGridColumn );
                 state.setEventInitialX( ap.getX() );
-                state.setEventInitialColumnWidth( state.getGridColumn().getWidth() );
+                state.setEventInitialColumnWidth( state.getActiveGridColumn().getWidth() );
                 state.setOperation( GridWidgetHandlersState.GridWidgetHandlersOperation.COLUMN_MOVE );
                 break;
         }
     }
 
-    private void showColumnHighlight( final IGridData grid,
-                                      final IGridColumn gridColumn ) {
-        final IBaseGridWidget<?, ?, ?> gridWidget = selectables.get( grid );
-        final double highlightOffsetX = grid.getColumnOffset( gridColumn );
+    private void showColumnHighlight( final IBaseGridWidget<?, ?, ?> gridWidget,
+                                      final IGridColumn<?, ?> gridColumn ) {
+        final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
+        final int columnIndex = gridModel.getColumns().indexOf( gridColumn );
+        final double highlightOffsetX = gridModel.getColumnOffset( gridColumn );
 
         final Rectangle bounds = layer.getVisibleBounds();
         final double highlightHeight = Math.min( bounds.getY() + bounds.getHeight() - gridWidget.getY(),

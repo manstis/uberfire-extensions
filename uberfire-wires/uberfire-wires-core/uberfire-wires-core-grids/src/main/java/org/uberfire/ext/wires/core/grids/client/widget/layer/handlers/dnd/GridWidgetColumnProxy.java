@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.dnd;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.Rectangle;

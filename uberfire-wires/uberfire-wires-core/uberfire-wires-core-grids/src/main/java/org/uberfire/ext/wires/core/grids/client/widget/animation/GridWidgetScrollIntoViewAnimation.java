@@ -24,7 +24,7 @@ import com.ait.lienzo.client.core.shape.Viewport;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
 import com.google.gwt.user.client.Command;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * An animation to reposition the ViewPort so the given GridWidget is centred

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.uberfire.ext.wires.core.grids.client.widget.dnd;
+package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 
 import com.google.gwt.dom.client.Style;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
-import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * A container for the state of the MouseDown, MouseMove and MouseUp handlers during a drag operation.
  */
 public class GridWidgetHandlersState {
 
-    private IGridData grid = null;
-    private IGridColumn gridColumn = null;
+    private IBaseGridWidget<?, ?, ?> activeGridWidget = null;
+    private IGridColumn<?, ?> activeGridColumn = null;
     private GridWidgetHandlersOperation operation = GridWidgetHandlersOperation.NONE;
     private Style.Cursor cursor = Style.Cursor.DEFAULT;
 
@@ -45,35 +45,36 @@ public class GridWidgetHandlersState {
     }
 
     /**
-     * The data backing the Grid.
+     * The active Grid.
      * @return
      */
-    public IGridData getGrid() {
-        return grid;
+    public IBaseGridWidget<?, ?, ?> getActiveGridWidget() {
+        return activeGridWidget;
     }
 
     /**
-     * Set the data backing the Grid.
-     * @param grid
+     * Set the active Grid.
+     * @param gridWidget
      */
-    public void setGrid( final IGridData grid ) {
-        this.grid = grid;
+    public void setActiveGridWidget( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        this.activeGridWidget = gridWidget;
     }
 
     /**
      * The column being affected by the current the operation.
      * @return
      */
-    public IGridColumn getGridColumn() {
-        return gridColumn;
+    public IGridColumn<?, ?> getActiveGridColumn() {
+        return activeGridColumn;
     }
 
     /**
      * Set the column to be affected by the current the operation.
+     * @param activeGridColumn
      * @return
      */
-    public void setGridColumn( final IGridColumn gridColumn ) {
-        this.gridColumn = gridColumn;
+    public void setActiveGridColumn( final IGridColumn<?, ?> activeGridColumn ) {
+        this.activeGridColumn = activeGridColumn;
     }
 
     /**

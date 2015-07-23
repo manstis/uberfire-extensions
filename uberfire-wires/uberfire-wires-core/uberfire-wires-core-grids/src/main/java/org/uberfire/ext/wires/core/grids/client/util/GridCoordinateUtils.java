@@ -17,7 +17,7 @@ package org.uberfire.ext.wires.core.grids.client.util;
 
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * Utilities class

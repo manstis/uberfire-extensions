@@ -17,6 +17,7 @@ package org.uberfire.ext.wires.core.grids.client.widget;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
@@ -62,14 +63,18 @@ import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
 import org.uberfire.ext.wires.core.grids.client.util.GridDataFactory;
-import org.uberfire.ext.wires.core.grids.client.widget.basic.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.dom.CheckBoxDOMElementFactory;
 import org.uberfire.ext.wires.core.grids.client.widget.dom.TextBoxDOMElement;
 import org.uberfire.ext.wires.core.grids.client.widget.dom.TextBoxDOMElementFactory;
 import org.uberfire.ext.wires.core.grids.client.widget.dom.TextBoxSingletonDOMElementFactory;
 import org.uberfire.ext.wires.core.grids.client.widget.edit.EditorPopup;
-import org.uberfire.ext.wires.core.grids.client.widget.mergable.MergableGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable.MergableGridWidgetMouseClickHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable.MergableGridWidgetMouseDoubleClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.basic.BlueGridRenderer;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.basic.GreenGridRenderer;
@@ -110,7 +115,8 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
 
     private final EditorPopup editor = new EditorPopup();
 
-    private GridLayer gridLayer = new GridLayer();
+    private GridLayer gridLayer = new GridLayer( new MergableGridWidgetMouseClickHandler( this ),
+                                                 new MergableGridWidgetMouseDoubleClickHandler( this ) );
     private LienzoPanel gridPanel = new LienzoPanel( VP_WIDTH,
                                                      VP_HEIGHT );
 
@@ -611,13 +617,18 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
     }
 
     @Override
-    public void select( final IGridData<?, ?, ?> selectable ) {
-        gridLayer.select( selectable );
+    public void select( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        gridLayer.select( gridWidget );
     }
 
     @Override
     public void selectLinkedColumn( final IGridColumn<?, ?> link ) {
         gridLayer.selectLinkedColumn( link );
+    }
+
+    @Override
+    public Set<IBaseGridWidget<?, ?, ?>> getGridWidgets() {
+        return gridLayer.getGridWidgets();
     }
 
 }

@@ -16,7 +16,7 @@
 package org.uberfire.ext.wires.core.grids.client.widget.context;
 
 import com.ait.lienzo.client.core.types.Transform;
-import org.uberfire.ext.wires.core.grids.client.widget.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * The context of a Grid's header during the rendering phase.
