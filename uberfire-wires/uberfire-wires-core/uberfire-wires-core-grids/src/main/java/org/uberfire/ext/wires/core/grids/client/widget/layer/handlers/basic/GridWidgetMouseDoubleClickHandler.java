@@ -17,7 +17,6 @@ package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.basic;
 
 import org.uberfire.client.callbacks.Callback;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCellValue;
-import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridCell;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
@@ -39,16 +38,16 @@ public class GridWidgetMouseDoubleClickHandler extends BaseGridWidgetMouseDouble
     @SuppressWarnings("unused")
     protected double getRowOffset( final int rowIndex,
                                    final int columnIndex,
-                                   final IGridData<?, ?, ?> activeGridModel ) {
-        return activeGridModel.getRowOffset( rowIndex );
+                                   final GridData gridModel ) {
+        return gridModel.getRowOffset( rowIndex );
     }
 
     @Override
     @SuppressWarnings("unused")
     protected double getCellHeight( final int rowIndex,
                                     final int columnIndex,
-                                    final IGridData<?, ?, ?> activeGridModel ) {
-        return activeGridModel.getRow( rowIndex ).getHeight();
+                                    final GridData gridModel ) {
+        return gridModel.getRow( rowIndex ).getHeight();
     }
 
     @Override

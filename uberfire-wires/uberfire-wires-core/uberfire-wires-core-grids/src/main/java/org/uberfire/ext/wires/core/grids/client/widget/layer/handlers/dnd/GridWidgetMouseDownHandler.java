@@ -19,8 +19,10 @@ import com.ait.lienzo.client.core.event.NodeMouseDownEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDownHandler;
 import com.ait.lienzo.client.core.shape.Rectangle;
 import com.ait.lienzo.client.core.types.Point2D;
+import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
 import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
@@ -28,13 +30,13 @@ import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 /**
  * MouseDownHandler to handle the commencement of drag operations.
  */
-public class GridWidgetMouseDownHandler implements NodeMouseDownHandler {
+public class GridWidgetMouseDownHandler<W extends IBaseGridWidget<?, M, ?>, M extends IGridData<R, C, V>, R extends IGridRow<V>, C extends IGridColumn<R, V>, V extends IGridCell<?>> implements NodeMouseDownHandler {
 
     private final GridLayer layer;
-    private final GridWidgetHandlersState state;
+    private final GridWidgetHandlersState<W, M, R, C, V> state;
 
     public GridWidgetMouseDownHandler( final GridLayer layer,
-                                       final GridWidgetHandlersState state ) {
+                                       final GridWidgetHandlersState<W, M, R, C, V> state ) {
         this.layer = layer;
         this.state = state;
     }
@@ -47,8 +49,8 @@ public class GridWidgetMouseDownHandler implements NodeMouseDownHandler {
         }
 
         //Get the GridWidget for the grid.
-        final IGridColumn<?, ?> activeGridColumn = state.getActiveGridColumn();
-        final IBaseGridWidget<?, ?, ?> activeGridWidget = state.getActiveGridWidget();
+        final C activeGridColumn = state.getActiveGridColumn();
+        final W activeGridWidget = state.getActiveGridWidget();
         final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( activeGridWidget,
                                                                              new Point2D( event.getX(),
                                                                                           event.getY() ) );
@@ -71,11 +73,10 @@ public class GridWidgetMouseDownHandler implements NodeMouseDownHandler {
         }
     }
 
-    private void showColumnHighlight( final IBaseGridWidget<?, ?, ?> gridWidget,
-                                      final IGridColumn<?, ?> gridColumn ) {
-        final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
-        final int columnIndex = gridModel.getColumns().indexOf( gridColumn );
-        final double highlightOffsetX = gridModel.getColumnOffset( columnIndex );
+    private void showColumnHighlight( final W gridWidget,
+                                      final C gridColumn ) {
+        final M gridModel = gridWidget.getModel();
+        final double highlightOffsetX = gridModel.getColumnOffset( gridColumn );
 
         final Rectangle bounds = layer.getVisibleBounds();
         final double highlightHeight = Math.min( bounds.getY() + bounds.getHeight() - gridWidget.getY(),

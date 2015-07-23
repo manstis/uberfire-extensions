@@ -15,7 +15,6 @@
  */
 package org.uberfire.ext.wires.core.grids.client.widget.grid;
 
-import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.Node;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;

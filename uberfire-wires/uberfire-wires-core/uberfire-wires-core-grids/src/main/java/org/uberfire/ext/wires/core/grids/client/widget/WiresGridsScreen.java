@@ -21,12 +21,9 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 
-import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
-import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.mediator.MousePanMediator;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.Layer;
-import com.ait.lienzo.client.core.shape.Rectangle;
 import com.ait.lienzo.client.core.shape.Text;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
@@ -74,8 +71,6 @@ import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
-import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable.MergableGridWidgetMouseClickHandler;
-import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable.MergableGridWidgetMouseDoubleClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.basic.BlueGridRenderer;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.basic.GreenGridRenderer;
@@ -116,8 +111,7 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
 
     private final EditorPopup editor = new EditorPopup();
 
-    private GridLayer gridLayer = new GridLayer( new MergableGridWidgetMouseClickHandler( this ),
-                                                 new MergableGridWidgetMouseDoubleClickHandler( this ) );
+    private GridLayer gridLayer = new GridLayer();
     private LienzoPanel gridPanel = new LienzoPanel( VP_WIDTH,
                                                      VP_HEIGHT );
 
@@ -150,13 +144,6 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
         gridPanel.add( gridLayer );
         domElementContainer.add( gridPanel );
 
-        gridLayer.addNodeMouseClickHandler( new NodeMouseClickHandler() {
-            @Override
-            public void onNodeMouseClick( NodeMouseClickEvent nodeMouseClickEvent ) {
-                gridPanel.setFocus( true );
-            }
-        } );
-
         //Grid 1
         final MergableGridData grid1 = new MergableGridData();
         final MergableGridWidget gridWidget1 = new MergableGridWidget( grid1,
@@ -171,22 +158,16 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
                 public void renderCell( final Group g,
                                         final MergableGridCell<String> cell,
                                         final GridCellRenderContext context ) {
-                    final double gx = gridWidget1.getX();
-                    final double gy = gridWidget1.getY();
-                    gridWidget1.getLayer().getContext().drawImage( textHolder.getCanvasElement(), gx, gy );
-
-                    final Rectangle r = new Rectangle( 10, 10 ).setFillColor( ColorName.THISTLE );
-                    g.add( r );
-//                    final Text t = new Text( cell.getValue().getValue() )
-//                            .setFillColor( ColorName.GREY )
-//                            .setFontSize( 12 )
-//                            .setFontFamily( "serif" )
-//                            .setListening( false )
-//                            .setTextBaseLine( TextBaseLine.MIDDLE )
-//                            .setTextAlign( TextAlign.CENTER )
-//                            .setX( context.getWidth() / 2 )
-//                            .setY( context.getHeight() / 2 );
-//                    g.add( t );
+                    final Text t = new Text( cell.getValue().getValue() )
+                            .setFillColor( ColorName.GREY )
+                            .setFontSize( 12 )
+                            .setFontFamily( "serif" )
+                            .setListening( false )
+                            .setTextBaseLine( TextBaseLine.MIDDLE )
+                            .setTextAlign( TextAlign.CENTER )
+                            .setX( context.getWidth() / 2 )
+                            .setY( context.getHeight() / 2 );
+                    g.add( t );
                 }
 
                 @Override
@@ -450,7 +431,7 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
                         .setTextBaseLine( TextBaseLine.MIDDLE )
                         .setTextAlign( TextAlign.CENTER )
                         .setX( context.getWidth() / 2 )
-                        .setY( context.getY() + context.getHeight() / 2 );
+                        .setY( context.getHeight() / 2 );
                 g.add( t );
             }
 

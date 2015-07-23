@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
+import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.event.NodeMouseDownEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDownHandler;
 import com.ait.lienzo.client.core.event.NodeMouseMoveEvent;
@@ -43,18 +45,23 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Command;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridCell;
+import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColumn;
+import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
+import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridRow;
 import org.uberfire.ext.wires.core.grids.client.widget.GridWidgetConnector;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.animation.GridWidgetScrollIntoViewAnimation;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseDoubleClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetHandlersState;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetMouseDownHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetMouseMoveHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWidgetMouseUpHandler;
-
-//import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable.MergableGridWidgetMouseClickHandler;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable.MergableGridWidgetMouseDoubleClickHandler;
 
 /**
  * A specialised Layer that supports pass-through of MouseEvents from DOMElements to GridWidgets.
@@ -65,7 +72,8 @@ import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd.GridWi
 public class GridLayer extends Layer implements ISelectionManager,
                                                 NodeMouseDownHandler,
                                                 NodeMouseMoveHandler,
-                                                NodeMouseUpHandler {
+                                                NodeMouseUpHandler,
+                                                NodeMouseClickHandler {
 
     private Set<IBaseGridWidget<?, ?, ?>> gridWidgets = new HashSet<IBaseGridWidget<?, ?, ?>>();
     private Map<GridWidgetConnector, Arrow> connectors = new HashMap<GridWidgetConnector, Arrow>();
@@ -73,14 +81,14 @@ public class GridLayer extends Layer implements ISelectionManager,
     private Rectangle bounds;
     private boolean isRedrawScheduled = false;
 
-    private final GridWidgetMouseDownHandler mouseDownHandler;
-    private final GridWidgetMouseMoveHandler mouseMoveHandler;
-    private final GridWidgetMouseUpHandler mouseUpHandler;
+    private final GridWidgetMouseDownHandler<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>> mouseDownHandler;
+    private final GridWidgetMouseMoveHandler<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>> mouseMoveHandler;
+    private final GridWidgetMouseUpHandler<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>> mouseUpHandler;
 
-    private final BaseGridWidgetMouseClickHandler<? extends IBaseGridWidget<?, ?, ?>> mouseClickHandler;
-    private final BaseGridWidgetMouseDoubleClickHandler<? extends IBaseGridWidget<?, ?, ?>, ? extends IGridData<?, ?, ?>> mouseDoubleClickHandler;
+    private final BaseGridWidgetMouseClickHandler<MergableGridWidget> mouseClickHandler;
+    private final BaseGridWidgetMouseDoubleClickHandler<MergableGridWidget, MergableGridData> mouseDoubleClickHandler;
 
-    private final GridWidgetHandlersState state = new GridWidgetHandlersState();
+    private final GridWidgetHandlersState<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>> state = new GridWidgetHandlersState<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>>();
 
     private static final Command NOP_COMMAND = new Command() {
         @Override
@@ -89,21 +97,20 @@ public class GridLayer extends Layer implements ISelectionManager,
         }
     };
 
-    public GridLayer( final BaseGridWidgetMouseClickHandler<? extends IBaseGridWidget<?, ?, ?>> mouseClickHandler,
-                      final BaseGridWidgetMouseDoubleClickHandler<? extends IBaseGridWidget<?, ?, ?>, ? extends IGridData<?, ?, ?>> mouseDoubleClickHandler ) {
+    public GridLayer() {
         bounds = new Rectangle( 0, 0 ).setVisible( false );
         add( bounds );
 
         //Mouse handlers
-        this.mouseClickHandler = mouseClickHandler;
-        this.mouseDoubleClickHandler = mouseDoubleClickHandler;
+        this.mouseClickHandler = new MergableGridWidgetMouseClickHandler( this );
+        this.mouseDoubleClickHandler = new MergableGridWidgetMouseDoubleClickHandler( this );
 
-        this.mouseDownHandler = new GridWidgetMouseDownHandler( this,
-                                                                state );
-        this.mouseMoveHandler = new GridWidgetMouseMoveHandler( this,
-                                                                state );
-        this.mouseUpHandler = new GridWidgetMouseUpHandler( this,
-                                                            state );
+        this.mouseDownHandler = new GridWidgetMouseDownHandler<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>>( this,
+                                                                                                                                                                   state );
+        this.mouseMoveHandler = new GridWidgetMouseMoveHandler<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>>( this,
+                                                                                                                                                                   state );
+        this.mouseUpHandler = new GridWidgetMouseUpHandler<MergableGridWidget, MergableGridData, MergableGridRow, MergableGridColumn<?>, MergableGridCell<?>>( this,
+                                                                                                                                                               state );
         addNodeMouseClickHandler( mouseClickHandler );
         addNodeMouseDoubleClickHandler( mouseDoubleClickHandler );
         addNodeMouseDownHandler( mouseDownHandler );
@@ -124,6 +131,11 @@ public class GridLayer extends Layer implements ISelectionManager,
     @Override
     public void onNodeMouseUp( final NodeMouseUpEvent event ) {
         mouseUpHandler.onNodeMouseUp( event );
+    }
+
+    @Override
+    public void onNodeMouseClick( final NodeMouseClickEvent event ) {
+        mouseClickHandler.onNodeMouseClick( event );
     }
 
     public GridWidgetHandlersState getGridWidgetHandlersState() {

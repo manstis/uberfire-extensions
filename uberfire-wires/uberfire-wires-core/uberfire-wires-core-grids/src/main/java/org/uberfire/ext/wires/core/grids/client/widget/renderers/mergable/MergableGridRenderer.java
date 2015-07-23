@@ -27,10 +27,10 @@ import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridRow;
-import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridBodyRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridHeaderRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * A renderer that only renders the visible columns and rows of merged data. This implementation

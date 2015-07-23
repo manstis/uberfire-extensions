@@ -19,9 +19,9 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import org.uberfire.client.callbacks.Callback;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.IHasResources;
-import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
-import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 
 /**
  * Definition of a Factor that can create DOMElements for GWT Widget based cell content.

@@ -41,7 +41,7 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
 
     @Override
     public void onNodeMouseClick( final NodeMouseClickEvent event ) {
-        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        final W activeGridWidget = getActiveGridWidget( event );
         selectionManager.select( activeGridWidget );
         handleHeaderCellClick( event );
         handleBodyCellClick( event );
@@ -54,7 +54,7 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
      */
     protected void handleHeaderCellClick( final NodeMouseClickEvent event ) {
         //Get GridWidget relating to event
-        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        final W activeGridWidget = getActiveGridWidget( event );
         if ( activeGridWidget == null ) {
             return;
         }
@@ -103,22 +103,30 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
         //Do nothing by default
     }
 
-    protected IBaseGridWidget<?, ?, ?> getActiveGridWidget( final INodeXYEvent event ) {
+    @SuppressWarnings("unchecked")
+    protected W getActiveGridWidget( final INodeXYEvent event ) {
         final Set<IBaseGridWidget<?, ?, ?>> gridWidgets = selectionManager.getGridWidgets();
         for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
-            final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
-                                                                                 new Point2D( event.getX(),
-                                                                                              event.getY() ) );
+            try {
+                final W g = (W) gridWidget;
 
-            final double ax = ap.getX();
-            final double ay = ap.getY();
-            if ( ax < 0 || ax > gridWidget.getWidth() ) {
+                final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+                                                                                     new Point2D( event.getX(),
+                                                                                                  event.getY() ) );
+
+                final double ax = ap.getX();
+                final double ay = ap.getY();
+                if ( ax < 0 || ax > gridWidget.getWidth() ) {
+                    continue;
+                }
+                if ( ay < 0 || ay > gridWidget.getHeight() ) {
+                    continue;
+                }
+                return g;
+
+            } catch ( ClassCastException cce ) {
                 continue;
             }
-            if ( ay < 0 || ay > gridWidget.getHeight() ) {
-                continue;
-            }
-            return gridWidget;
         }
         return null;
     }

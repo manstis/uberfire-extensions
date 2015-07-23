@@ -15,6 +15,7 @@
  */
 package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,8 +24,10 @@ import com.ait.lienzo.client.core.event.NodeMouseMoveHandler;
 import com.ait.lienzo.client.core.mediator.IMediator;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.google.gwt.dom.client.Style;
+import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
 import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
@@ -33,16 +36,16 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 /**
  * MouseMoveHandler to handle to detect potential drag operations and handle the drag itself; if required.
  */
-public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
+public class GridWidgetMouseMoveHandler<W extends IBaseGridWidget<?, M, ?>, M extends IGridData<R, C, V>, R extends IGridRow<V>, C extends IGridColumn<R, V>, V extends IGridCell<?>> implements NodeMouseMoveHandler {
 
     // How close the mouse pointer needs to be to the column separator to initiate a resize operation.
     private static final int COLUMN_RESIZE_HANDLE_SENSITIVITY = 5;
 
     private final GridLayer layer;
-    private final GridWidgetHandlersState state;
+    private final GridWidgetHandlersState<W, M, R, C, V> state;
 
     public GridWidgetMouseMoveHandler( final GridLayer layer,
-                                       final GridWidgetHandlersState state ) {
+                                       final GridWidgetHandlersState<W, M, R, C, V> state ) {
         this.layer = layer;
         this.state = state;
     }
@@ -67,9 +70,9 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
                 state.setOperation( GridWidgetHandlersState.GridWidgetHandlersOperation.NONE );
                 state.setCursor( Style.Cursor.DEFAULT );
 
-                final Set<IBaseGridWidget<?, ?, ?>> gridWidgets = layer.getGridWidgets();
-                for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
-                    final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
+                final Set<W> gridWidgets = getGridWidgets();
+                for ( W gridWidget : gridWidgets ) {
+                    final M gridModel = gridWidget.getModel();
                     final IGridRenderer<?> renderer = gridWidget.getRenderer();
                     final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
                                                                                          new Point2D( event.getX(),
@@ -84,7 +87,7 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
                         continue;
                     } else if ( ay < renderer.getHeaderHeight() ) {
                         double offsetX = 0;
-                        for ( IGridColumn gc : gridModel.getColumns() ) {
+                        for ( C gc : gridModel.getColumns() ) {
                             //Check for column moving
                             if ( gc.isVisible() ) {
                                 final double columnWidth = gc.getWidth();
@@ -103,7 +106,7 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
 
                     } else {
                         double offsetX = 0;
-                        for ( IGridColumn gc : gridModel.getColumns() ) {
+                        for ( C gc : gridModel.getColumns() ) {
                             //Check for column resizing
                             if ( gc.isVisible() ) {
                                 final double columnWidth = gc.getWidth();
@@ -155,10 +158,10 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
     }
 
     private void handleColumnMove( final NodeMouseMoveEvent event ) {
-        final IBaseGridWidget<?, ?, ?> activeGridWidget = state.getActiveGridWidget();
-        final IGridData<?, ?, ?> activeGridModel = activeGridWidget.getModel();
-        final List<? extends IGridColumn<?, ?>> columns = activeGridModel.getColumns();
-        final IGridColumn<?, ?> activeGridColumn = state.getActiveGridColumn();
+        final W activeGridWidget = state.getActiveGridWidget();
+        final M activeGridModel = activeGridWidget.getModel();
+        final List<C> columns = activeGridModel.getColumns();
+        final C activeGridColumn = state.getActiveGridColumn();
 
         final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( activeGridWidget,
                                                                              new Point2D( event.getX(),
@@ -167,7 +170,7 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
 
         double offsetX = 0;
         for ( int index = 0; index < columns.size(); index++ ) {
-            final IGridColumn<?, ?> gc = columns.get( index );
+            final C gc = columns.get( index );
             if ( gc.isVisible() ) {
                 final double columnWidth = gc.getWidth();
                 if ( activeGridColumn.getColumnGroup().equals( gc.getColumnGroup() ) ) {
@@ -175,11 +178,9 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
                     final double minColX = Math.max( offsetX, offsetX + ( columnWidth - columnMovedWidth ) / 2 );
                     final double maxColX = Math.min( offsetX + columnWidth, offsetX + ( columnWidth + columnMovedWidth ) / 2 );
                     if ( ax > minColX && ax < maxColX ) {
-// TODO {manstis} This needs fixing
-//                        activeGridModel.moveColumnTo( index,
-//                                                      activeGridColumn );
-                        final int activeGridColumnIndex = columns.indexOf( activeGridColumn );
-                        state.getEventColumnHighlight().setX( activeGridWidget.getX() + activeGridModel.getColumnOffset( activeGridColumnIndex ) );
+                        activeGridModel.moveColumnTo( index,
+                                                      activeGridColumn );
+                        state.getEventColumnHighlight().setX( activeGridWidget.getX() + activeGridModel.getColumnOffset( activeGridColumn ) );
                         layer.draw();
                         break;
                     }
@@ -187,6 +188,20 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
                 offsetX = offsetX + columnWidth;
             }
         }
+    }
+
+    private Set<W> getGridWidgets() {
+        final Set<W> gridWidgets = new HashSet<W>();
+        for ( IBaseGridWidget<?, ?, ?> gridWidget : layer.getGridWidgets() ) {
+            try {
+                final W g = ( (W) gridWidget );
+                gridWidgets.add( g );
+
+            } catch ( ClassCastException cce ) {
+                continue;
+            }
+        }
+        return gridWidgets;
     }
 
 }

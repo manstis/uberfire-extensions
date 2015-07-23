@@ -24,10 +24,10 @@ import com.ait.lienzo.client.core.shape.Rectangle;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridRow;
-import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridBodyRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridHeaderRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 
 /**

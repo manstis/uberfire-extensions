@@ -18,18 +18,23 @@ package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 import com.ait.lienzo.client.core.event.NodeMouseUpEvent;
 import com.ait.lienzo.client.core.event.NodeMouseUpHandler;
 import com.google.gwt.dom.client.Style;
+import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
+import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
+import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 
 /**
  * MouseUpHandler to handle completion of drag operations and release resources.
  */
-public class GridWidgetMouseUpHandler implements NodeMouseUpHandler {
+public class GridWidgetMouseUpHandler<W extends IBaseGridWidget<?, M, ?>, M extends IGridData<R, C, V>, R extends IGridRow<V>, C extends IGridColumn<R, V>, V extends IGridCell<?>> implements NodeMouseUpHandler {
 
     private final GridLayer layer;
-    private final GridWidgetHandlersState state;
+    private final GridWidgetHandlersState<W, M, R, C, V> state;
 
     public GridWidgetMouseUpHandler( final GridLayer layer,
-                                     final GridWidgetHandlersState state ) {
+                                     final GridWidgetHandlersState<W, M, R, C, V> state ) {
         this.layer = layer;
         this.state = state;
     }

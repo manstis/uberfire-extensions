@@ -16,16 +16,19 @@
 package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.dnd;
 
 import com.google.gwt.dom.client.Style;
+import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
+import org.uberfire.ext.wires.core.grids.client.model.IGridData;
+import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 
 /**
  * A container for the state of the MouseDown, MouseMove and MouseUp handlers during a drag operation.
  */
-public class GridWidgetHandlersState {
+public class GridWidgetHandlersState<W extends IBaseGridWidget<?, M, ?>, M extends IGridData<R, C, V>, R extends IGridRow<V>, C extends IGridColumn<R, V>, V extends IGridCell<?>> {
 
-    private IBaseGridWidget<?, ?, ?> activeGridWidget = null;
-    private IGridColumn<?, ?> activeGridColumn = null;
+    private W activeGridWidget = null;
+    private C activeGridColumn = null;
     private GridWidgetHandlersOperation operation = GridWidgetHandlersOperation.NONE;
     private Style.Cursor cursor = Style.Cursor.DEFAULT;
 
@@ -48,7 +51,7 @@ public class GridWidgetHandlersState {
      * The active Grid.
      * @return
      */
-    public IBaseGridWidget<?, ?, ?> getActiveGridWidget() {
+    public W getActiveGridWidget() {
         return activeGridWidget;
     }
 
@@ -56,7 +59,7 @@ public class GridWidgetHandlersState {
      * Set the active Grid.
      * @param gridWidget
      */
-    public void setActiveGridWidget( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+    public void setActiveGridWidget( final W gridWidget ) {
         this.activeGridWidget = gridWidget;
     }
 
@@ -64,7 +67,7 @@ public class GridWidgetHandlersState {
      * The column being affected by the current the operation.
      * @return
      */
-    public IGridColumn<?, ?> getActiveGridColumn() {
+    public C getActiveGridColumn() {
         return activeGridColumn;
     }
 
@@ -73,7 +76,7 @@ public class GridWidgetHandlersState {
      * @param activeGridColumn
      * @return
      */
-    public void setActiveGridColumn( final IGridColumn<?, ?> activeGridColumn ) {
+    public void setActiveGridColumn( final C activeGridColumn ) {
         this.activeGridColumn = activeGridColumn;
     }
 

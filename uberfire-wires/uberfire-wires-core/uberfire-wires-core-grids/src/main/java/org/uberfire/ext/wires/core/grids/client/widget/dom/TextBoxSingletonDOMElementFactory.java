@@ -17,8 +17,8 @@ package org.uberfire.ext.wires.core.grids.client.widget.dom;
 
 import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.user.client.ui.AbsolutePanel;
-import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 
 /**
  * A DOMElement Factory for single-instance TextBoxes.

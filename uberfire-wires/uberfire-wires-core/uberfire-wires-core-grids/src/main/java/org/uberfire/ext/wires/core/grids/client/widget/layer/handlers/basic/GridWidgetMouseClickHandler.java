@@ -15,9 +15,9 @@
  */
 package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.basic;
 
-import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
 
 /**
  * MouseClickHandler for a Grid containing non-merged cells

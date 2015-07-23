@@ -17,7 +17,6 @@ package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.mergable;
 
 import org.uberfire.client.callbacks.Callback;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCellValue;
-import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridCell;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
@@ -38,8 +37,7 @@ public class MergableGridWidgetMouseDoubleClickHandler extends BaseGridWidgetMou
     @Override
     protected double getRowOffset( final int rowIndex,
                                    final int columnIndex,
-                                   final IGridData<?, ?, ?> activeGridModel ) {
-        final MergableGridData gridModel = (MergableGridData) activeGridModel;
+                                   final MergableGridData gridModel ) {
         final MergableGridCell<?> cell = gridModel.getCell( rowIndex,
                                                             columnIndex );
         if ( cell == null ) {
@@ -64,8 +62,7 @@ public class MergableGridWidgetMouseDoubleClickHandler extends BaseGridWidgetMou
     @Override
     protected double getCellHeight( final int rowIndex,
                                     final int columnIndex,
-                                    final IGridData<?, ?, ?> activeGridModel ) {
-        final MergableGridData gridModel = (MergableGridData) activeGridModel;
+                                    final MergableGridData gridModel ) {
         final MergableGridCell<?> cell = gridModel.getCell( rowIndex,
                                                             columnIndex );
         if ( cell == null ) {

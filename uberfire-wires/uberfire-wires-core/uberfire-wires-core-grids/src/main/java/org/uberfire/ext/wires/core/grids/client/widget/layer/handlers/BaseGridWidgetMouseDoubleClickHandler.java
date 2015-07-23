@@ -36,7 +36,6 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  * implementation supports double-clicking on a cell in the Body and delegating a response to the
  * sub-classes {code}onDoubleClick(){code} method.
  * @param <W> The GridWidget to which this MouseClickHandler is attached.
- * @param <M> The GridWidget's underlying Model
  */
 public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridWidget<?, M, ?>, M extends IGridData<?, ?, ?>> implements NodeMouseDoubleClickHandler {
 
@@ -68,7 +67,7 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
      */
     protected void handleBodyCellDoubleClick( final NodeMouseDoubleClickEvent event ) {
         //Get GridWidget relating to event
-        final IBaseGridWidget<?, ?, ?> activeGridWidget = getActiveGridWidget( event );
+        final W activeGridWidget = getActiveGridWidget( event );
         if ( activeGridWidget == null ) {
             return;
         }
@@ -87,7 +86,7 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
             return;
         }
 
-        final IGridData<?, ?, ?> activeGridModel = activeGridWidget.getModel();
+        final M activeGridModel = activeGridWidget.getModel();
 
         //Get row index
         IGridRow<?> row;
@@ -144,23 +143,23 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
      * This may be different to the underlying model's {code}getRowOffset(){code} for merged cells.
      * @param rowIndex The index of the row on which the MouseDoubleClickEvent occurred.
      * @param columnIndex The index of the column in which the MouseDoubleClickEvent occurred.
-     * @param activeGridModel The GridWidget's underlying Model
+     * @param gridModel The GridWidget's underlying Model
      * @return
      */
     protected abstract double getRowOffset( final int rowIndex,
                                             final int columnIndex,
-                                            final IGridData<?, ?, ?> activeGridModel );
+                                            final M gridModel );
 
     /**
      * Get the height of a cell. This may be different to the row's height for merged cells.
      * @param rowIndex The index of the row on which the MouseDoubleClickEvent occurred.
      * @param columnIndex The index of the column in which the MouseDoubleClickEvent occurred.
-     * @param activeGridModel The GridWidget's underlying Model
+     * @param gridModel The GridWidget's underlying Model
      * @return
      */
     protected abstract double getCellHeight( final int rowIndex,
                                              final int columnIndex,
-                                             final IGridData<?, ?, ?> activeGridModel );
+                                             final M gridModel );
 
     /**
      * Signal a MouseDoubleClickEvent has occurred on a cell in the Body.
@@ -170,22 +169,30 @@ public abstract class BaseGridWidgetMouseDoubleClickHandler<W extends IBaseGridW
      */
     protected abstract void onDoubleClick( final GridCellRenderContext context );
 
-    protected IBaseGridWidget<?, ?, ?> getActiveGridWidget( final INodeXYEvent event ) {
+    @SuppressWarnings("unchecked")
+    protected W getActiveGridWidget( final INodeXYEvent event ) {
         final Set<IBaseGridWidget<?, ?, ?>> gridWidgets = selectionManager.getGridWidgets();
         for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
-            final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
-                                                                                 new Point2D( event.getX(),
-                                                                                              event.getY() ) );
+            try {
+                final W g = (W) gridWidget;
 
-            final double ax = ap.getX();
-            final double ay = ap.getY();
-            if ( ax < 0 || ax > gridWidget.getWidth() ) {
+                final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
+                                                                                     new Point2D( event.getX(),
+                                                                                                  event.getY() ) );
+
+                final double ax = ap.getX();
+                final double ay = ap.getY();
+                if ( ax < 0 || ax > gridWidget.getWidth() ) {
+                    continue;
+                }
+                if ( ay < 0 || ay > gridWidget.getHeight() ) {
+                    continue;
+                }
+                return g;
+
+            } catch ( ClassCastException cce ) {
                 continue;
             }
-            if ( ay < 0 || ay > gridWidget.getHeight() ) {
-                continue;
-            }
-            return gridWidget;
         }
         return null;
     }

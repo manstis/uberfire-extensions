@@ -17,11 +17,14 @@ package org.uberfire.ext.wires.core.grids.client.widget.dom;
 
 import java.util.Iterator;
 
+import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDownEvent;
 import com.ait.lienzo.client.core.event.NodeMouseMoveEvent;
 import com.ait.lienzo.client.core.event.NodeMouseUpEvent;
 import com.ait.lienzo.client.core.types.Transform;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -34,9 +37,9 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCell;
-import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
-import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
+import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
 
 /**
  * The base of all DOMElements, providing common services such as Browser event propagation. MouseEvents do not bubble
@@ -142,6 +145,26 @@ public abstract class BaseDOMElement<T, W extends Widget> {
                 } );
             }
         }, MouseUpEvent.getType() );
+        widgetContainer.addDomHandler( new ClickHandler() {
+            @Override
+            public void onClick( final ClickEvent event ) {
+                gridLayer.onNodeMouseClick( new NodeMouseClickEvent(  event ) {
+
+                    @Override
+                    public int getX() {
+                        //Adjust the x-coordinate (relative to the DOM Element) to be relative to the GridCanvas.
+                        return super.getX() + widgetContainer.getElement().getOffsetLeft();
+                    }
+
+                    @Override
+                    public int getY() {
+                        //Adjust the y-coordinate (relative to the DOM Element) to be relative to the GridCanvas.
+                        return super.getY() + widgetContainer.getElement().getOffsetTop();
+                    }
+
+                } );
+            }
+        }, ClickEvent.getType() );
     }
 
     /**
