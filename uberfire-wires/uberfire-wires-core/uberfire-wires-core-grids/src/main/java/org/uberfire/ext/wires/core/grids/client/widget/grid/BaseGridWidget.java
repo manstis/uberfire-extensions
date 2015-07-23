@@ -47,6 +47,7 @@ public abstract class BaseGridWidget<M extends IGridData<?, ?, ?>, R extends IGr
                            final R renderer ) {
         this.model = model;
         this.renderer = renderer;
+        setListening( false );
     }
 
     /**

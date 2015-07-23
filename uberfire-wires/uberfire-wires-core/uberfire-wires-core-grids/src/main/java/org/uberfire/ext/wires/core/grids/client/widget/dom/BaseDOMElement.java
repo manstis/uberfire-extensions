@@ -148,7 +148,7 @@ public abstract class BaseDOMElement<T, W extends Widget> {
         widgetContainer.addDomHandler( new ClickHandler() {
             @Override
             public void onClick( final ClickEvent event ) {
-                gridLayer.onNodeMouseClick( new NodeMouseClickEvent(  event ) {
+                gridLayer.onNodeMouseClick( new NodeMouseClickEvent( event ) {
 
                     @Override
                     public int getX() {

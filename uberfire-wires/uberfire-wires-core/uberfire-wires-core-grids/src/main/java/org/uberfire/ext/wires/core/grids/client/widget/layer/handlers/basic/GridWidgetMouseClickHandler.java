@@ -16,6 +16,7 @@
 package org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.basic;
 
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
 
@@ -26,6 +27,11 @@ public class GridWidgetMouseClickHandler extends BaseGridWidgetMouseClickHandler
 
     public GridWidgetMouseClickHandler( final ISelectionManager selectionManager ) {
         super( selectionManager );
+    }
+
+    @Override
+    protected boolean accept( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        return gridWidget instanceof GridWidget;
     }
 
 }

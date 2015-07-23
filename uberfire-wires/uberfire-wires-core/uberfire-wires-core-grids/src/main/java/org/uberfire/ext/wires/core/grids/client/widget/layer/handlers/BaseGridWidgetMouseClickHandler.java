@@ -107,9 +107,7 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
     protected W getActiveGridWidget( final INodeXYEvent event ) {
         final Set<IBaseGridWidget<?, ?, ?>> gridWidgets = selectionManager.getGridWidgets();
         for ( IBaseGridWidget<?, ?, ?> gridWidget : gridWidgets ) {
-            try {
-                final W g = (W) gridWidget;
-
+            if ( accept( gridWidget ) ) {
                 final Point2D ap = GridCoordinateUtils.mapToGridWidgetAbsolutePoint( gridWidget,
                                                                                      new Point2D( event.getX(),
                                                                                                   event.getY() ) );
@@ -122,13 +120,12 @@ public abstract class BaseGridWidgetMouseClickHandler<W extends IBaseGridWidget<
                 if ( ay < 0 || ay > gridWidget.getHeight() ) {
                     continue;
                 }
-                return g;
-
-            } catch ( ClassCastException cce ) {
-                continue;
+                return (W) gridWidget;
             }
         }
         return null;
     }
+
+    protected abstract boolean accept( final IBaseGridWidget<?, ?, ?> gridWidget );
 
 }

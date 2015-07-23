@@ -22,6 +22,7 @@ import org.uberfire.ext.wires.core.grids.client.model.basic.GridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.basic.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseDoubleClickHandler;
 
@@ -71,6 +72,11 @@ public class GridWidgetMouseDoubleClickHandler extends BaseGridWidgetMouseDouble
                              gridWidget.getLayer().draw();
                          }
                      } );
+    }
+
+    @Override
+    protected boolean accept( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        return gridWidget instanceof GridWidget;
     }
 
 }

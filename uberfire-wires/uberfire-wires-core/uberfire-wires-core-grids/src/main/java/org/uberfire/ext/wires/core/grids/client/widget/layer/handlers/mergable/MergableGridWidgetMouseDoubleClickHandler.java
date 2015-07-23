@@ -22,6 +22,7 @@ import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridColum
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridCellRenderContext;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseDoubleClickHandler;
 
@@ -112,6 +113,11 @@ public class MergableGridWidgetMouseDoubleClickHandler extends BaseGridWidgetMou
                              gridWidget.getLayer().draw();
                          }
                      } );
+    }
+
+    @Override
+    protected boolean accept( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        return gridWidget instanceof MergableGridWidget;
     }
 
 }

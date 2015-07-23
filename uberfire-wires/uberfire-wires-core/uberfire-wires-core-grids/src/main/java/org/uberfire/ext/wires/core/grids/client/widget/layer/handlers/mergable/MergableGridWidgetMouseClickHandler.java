@@ -27,6 +27,7 @@ import org.uberfire.ext.wires.core.grids.client.util.GridCoordinateUtils;
 import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.animation.MergableGridWidgetCollapseRowsAnimation;
 import org.uberfire.ext.wires.core.grids.client.widget.animation.MergableGridWidgetExpandRowsAnimation;
+import org.uberfire.ext.wires.core.grids.client.widget.grid.IBaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.mergable.MergableGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.handlers.BaseGridWidgetMouseClickHandler;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
@@ -130,6 +131,11 @@ public class MergableGridWidgetMouseClickHandler extends BaseGridWidgetMouseClic
                         cell.getMergedCellCount(),
                         columnIndex );
         }
+    }
+
+    @Override
+    protected boolean accept( final IBaseGridWidget<?, ?, ?> gridWidget ) {
+        return gridWidget instanceof MergableGridWidget;
     }
 
     protected void collapseRows( final MergableGridWidget gridWidget,
