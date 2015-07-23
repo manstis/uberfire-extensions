@@ -25,6 +25,8 @@ import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.mediator.MousePanMediator;
 import com.ait.lienzo.client.core.shape.Group;
+import com.ait.lienzo.client.core.shape.Layer;
+import com.ait.lienzo.client.core.shape.Rectangle;
 import com.ait.lienzo.client.core.shape.Text;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
@@ -54,7 +56,6 @@ import org.uberfire.client.callbacks.Callback;
 import org.uberfire.ext.wires.core.grids.client.model.BaseGridCellValue;
 import org.uberfire.ext.wires.core.grids.client.model.IGridCellValue;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
-import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridCell;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
@@ -159,7 +160,6 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
         //Grid 1
         final MergableGridData grid1 = new MergableGridData();
         final MergableGridWidget gridWidget1 = new MergableGridWidget( grid1,
-                                                                       this,
                                                                        new MergableGridRenderer() );
         for ( int idx = 0; idx < 10; idx++ ) {
             final int grid1ColumnGroupSuffix = ( idx < 5 ? 0 : 1 );
@@ -171,16 +171,22 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
                 public void renderCell( final Group g,
                                         final MergableGridCell<String> cell,
                                         final GridCellRenderContext context ) {
-                    final Text t = new Text( cell.getValue().getValue() )
-                            .setFillColor( ColorName.GREY )
-                            .setFontSize( 12 )
-                            .setFontFamily( "serif" )
-                            .setListening( false )
-                            .setTextBaseLine( TextBaseLine.MIDDLE )
-                            .setTextAlign( TextAlign.CENTER )
-                            .setX( context.getWidth() / 2 )
-                            .setY( context.getHeight() / 2 );
-                    g.add( t );
+                    final double gx = gridWidget1.getX();
+                    final double gy = gridWidget1.getY();
+                    gridWidget1.getLayer().getContext().drawImage( textHolder.getCanvasElement(), gx, gy );
+
+                    final Rectangle r = new Rectangle( 10, 10 ).setFillColor( ColorName.THISTLE );
+                    g.add( r );
+//                    final Text t = new Text( cell.getValue().getValue() )
+//                            .setFillColor( ColorName.GREY )
+//                            .setFontSize( 12 )
+//                            .setFontFamily( "serif" )
+//                            .setListening( false )
+//                            .setTextBaseLine( TextBaseLine.MIDDLE )
+//                            .setTextAlign( TextAlign.CENTER )
+//                            .setX( context.getWidth() / 2 )
+//                            .setY( context.getHeight() / 2 );
+//                    g.add( t );
                 }
 
                 @Override
@@ -203,7 +209,6 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
         //Grid 2
         final MergableGridData grid2 = new MergableGridData();
         final MergableGridWidget gridWidget2 = new MergableGridWidget( grid2,
-                                                                       this,
                                                                        new MergableGridRenderer() );
         for ( int idx = 0; idx < 5; idx++ ) {
             final MergableGridColumn<String> grid2Column = new MergableGridColumn<String>( "G2-G0-C" + idx,
@@ -241,7 +246,6 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
         //Grid 3
         final MergableGridData grid3 = new MergableGridData();
         final MergableGridWidget gridWidget3 = new MergableGridWidget( grid3,
-                                                                       this,
                                                                        new MergableGridRenderer() );
         for ( int idx = 0; idx < 2; idx++ ) {
             final boolean isResizeable = idx != 1;
@@ -428,7 +432,6 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
         //Grid 4
         final GridData grid4 = new GridData();
         final GridWidget gridWidget4 = new GridWidget( grid4,
-                                                       this,
                                                        new RedGridRenderer() );
 
         //Grid 4 - DOM Column - TextBox
@@ -447,7 +450,7 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
                         .setTextBaseLine( TextBaseLine.MIDDLE )
                         .setTextAlign( TextAlign.CENTER )
                         .setX( context.getWidth() / 2 )
-                        .setY( context.getHeight() / 2 );
+                        .setY( context.getY() + context.getHeight() / 2 );
                 g.add( t );
             }
 
@@ -629,6 +632,23 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
     @Override
     public Set<IBaseGridWidget<?, ?, ?>> getGridWidgets() {
         return gridLayer.getGridWidgets();
+    }
+
+    private final TextHolder textHolder = new TextHolder();
+
+    private static class TextHolder extends Layer {
+
+        public TextHolder() {
+            final Text t = new Text( "a" )
+                    .setFillColor( ColorName.GREY )
+                    .setFontSize( 12 )
+                    .setFontFamily( "serif" )
+                    .setListening( false )
+                    .setTextBaseLine( TextBaseLine.MIDDLE )
+                    .setTextAlign( TextAlign.CENTER );
+            add( t );
+        }
+
     }
 
 }

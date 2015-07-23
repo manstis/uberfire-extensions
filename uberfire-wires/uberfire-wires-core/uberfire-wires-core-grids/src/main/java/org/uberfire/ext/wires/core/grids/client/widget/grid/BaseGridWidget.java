@@ -18,8 +18,6 @@ package org.uberfire.ext.wires.core.grids.client.widget.grid;
 import java.util.List;
 
 import com.ait.lienzo.client.core.Context2D;
-import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
-import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.Rectangle;
 import com.ait.lienzo.client.core.shape.Viewport;
@@ -27,7 +25,6 @@ import com.ait.lienzo.client.core.types.ClipRegion;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
 import org.uberfire.ext.wires.core.grids.client.model.IGridRow;
-import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridBodyRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.context.GridHeaderRenderContext;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer;
@@ -40,26 +37,16 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
  */
 public abstract class BaseGridWidget<M extends IGridData<?, ?, ?>, R extends IGridRenderer<M>> extends Group implements IBaseGridWidget<Group, M, R> {
 
-    private boolean isSelected = false;
     private Group selection = null;
+    private boolean isSelected = false;
 
     protected M model;
-    protected ISelectionManager selectionManager;
     protected R renderer;
 
     public BaseGridWidget( final M model,
-                           final ISelectionManager selectionManager,
                            final R renderer ) {
         this.model = model;
-        this.selectionManager = selectionManager;
         this.renderer = renderer;
-
-        addNodeMouseClickHandler( new NodeMouseClickHandler() {
-            @Override
-            public void onNodeMouseClick( final NodeMouseClickEvent nodeMouseClickEvent ) {
-                selectionManager.select( model );
-            }
-        } );
     }
 
     /**

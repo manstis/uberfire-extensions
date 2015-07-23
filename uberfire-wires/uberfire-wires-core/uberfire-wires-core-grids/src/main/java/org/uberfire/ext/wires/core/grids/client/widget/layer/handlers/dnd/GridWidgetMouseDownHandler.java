@@ -75,7 +75,7 @@ public class GridWidgetMouseDownHandler implements NodeMouseDownHandler {
                                       final IGridColumn<?, ?> gridColumn ) {
         final IGridData<?, ?, ?> gridModel = gridWidget.getModel();
         final int columnIndex = gridModel.getColumns().indexOf( gridColumn );
-        final double highlightOffsetX = gridModel.getColumnOffset( gridColumn );
+        final double highlightOffsetX = gridModel.getColumnOffset( columnIndex );
 
         final Rectangle bounds = layer.getVisibleBounds();
         final double highlightHeight = Math.min( bounds.getY() + bounds.getHeight() - gridWidget.getY(),

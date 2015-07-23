@@ -17,7 +17,6 @@ package org.uberfire.ext.wires.core.grids.client.widget.grid.basic;
 
 import org.uberfire.ext.wires.core.grids.client.model.basic.GridData;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.BaseGridWidget;
-import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 
 /**
@@ -26,10 +25,8 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.IGridRenderer;
 public class GridWidget extends BaseGridWidget<GridData, IGridRenderer<GridData>> {
 
     public GridWidget( final GridData model,
-                       final ISelectionManager selectionManager,
                        final IGridRenderer<GridData> renderer ) {
         super( model,
-               selectionManager,
                renderer );
     }
 

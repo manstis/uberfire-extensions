@@ -17,7 +17,6 @@ package org.uberfire.ext.wires.core.grids.client.widget.grid.mergable;
 
 import org.uberfire.ext.wires.core.grids.client.model.mergable.MergableGridData;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.BaseGridWidget;
-import org.uberfire.ext.wires.core.grids.client.widget.ISelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.renderers.mergable.IMergableGridRenderer;
 
 /**
@@ -26,10 +25,8 @@ import org.uberfire.ext.wires.core.grids.client.widget.renderers.mergable.IMerga
 public class MergableGridWidget extends BaseGridWidget<MergableGridData, IMergableGridRenderer> {
 
     public MergableGridWidget( final MergableGridData model,
-                               final ISelectionManager selectionManager,
                                final IMergableGridRenderer renderer ) {
         super( model,
-               selectionManager,
                renderer );
 
     }

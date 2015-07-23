@@ -175,10 +175,11 @@ public class GridWidgetMouseMoveHandler implements NodeMouseMoveHandler {
                     final double minColX = Math.max( offsetX, offsetX + ( columnWidth - columnMovedWidth ) / 2 );
                     final double maxColX = Math.min( offsetX + columnWidth, offsetX + ( columnWidth + columnMovedWidth ) / 2 );
                     if ( ax > minColX && ax < maxColX ) {
-                        activeGridModel.moveColumnTo( index,
-                                                      activeGridColumn );
+// TODO {manstis} This needs fixing
+//                        activeGridModel.moveColumnTo( index,
+//                                                      activeGridColumn );
                         final int activeGridColumnIndex = columns.indexOf( activeGridColumn );
-                        state.getEventColumnHighlight().setX( activeGridWidget.getX() + activeGridModel.getColumnOffset( activeGridColumn ) );
+                        state.getEventColumnHighlight().setX( activeGridWidget.getX() + activeGridModel.getColumnOffset( activeGridColumnIndex ) );
                         layer.draw();
                         break;
                     }
