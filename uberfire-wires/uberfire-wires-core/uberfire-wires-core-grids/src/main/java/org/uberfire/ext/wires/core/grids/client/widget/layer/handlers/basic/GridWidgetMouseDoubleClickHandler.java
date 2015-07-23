@@ -69,7 +69,7 @@ public class GridWidgetMouseDoubleClickHandler extends BaseGridWidgetMouseDouble
                              gridWidget.getModel().setCell( rowIndex,
                                                             columnIndex,
                                                             value );
-                             gridWidget.getLayer().draw();
+                             gridWidget.getLayer().batch();
                          }
                      } );
     }

@@ -128,7 +128,7 @@ public class TextBoxDOMElement extends BaseDOMElement<String, TextBox> {
                                                columnIndex,
                                                new BaseGridCellValue<String>( value ) );
             }
-            gridLayer.draw( command );
+            gridLayer.batch( command );
 
         } else {
             command.execute();

@@ -155,7 +155,7 @@ public class GridWidgetMouseMoveHandler<W extends IBaseGridWidget<?, M, ?>, M ex
             }
         }
         gridColumn.setWidth( columnNewWidth );
-        layer.draw();
+        layer.batch();
         return;
     }
 
@@ -183,7 +183,7 @@ public class GridWidgetMouseMoveHandler<W extends IBaseGridWidget<?, M, ?>, M ex
                         activeGridModel.moveColumnTo( index,
                                                       activeGridColumn );
                         state.getEventColumnHighlight().setX( activeGridWidget.getX() + activeGridModel.getColumnOffset( activeGridColumn ) );
-                        layer.draw();
+                        layer.batch();
                         break;
                     }
                 }

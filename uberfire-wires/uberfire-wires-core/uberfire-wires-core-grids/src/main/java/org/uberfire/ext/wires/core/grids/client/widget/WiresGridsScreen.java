@@ -137,6 +137,7 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
 
         //Lienzo stuff - Add mouse pan support
         final MousePanMediator mediator1 = new MousePanMediator();
+        mediator1.setBatchDraw( true );
         gridPanel.getViewport().getMediators().push( mediator1 );
 
         //Wire-up widgets
@@ -571,7 +572,7 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
             public void onChange( final ChangeEvent event ) {
                 final IGridRenderer<GridData> renderer = basicRenderers.get( basicRendererSelector.getItemText( basicRendererSelector.getSelectedIndex() ) );
                 gridWidget4.setRenderer( renderer );
-                gridLayer.draw();
+                gridLayer.batch();
             }
         } );
 
@@ -584,7 +585,7 @@ public class WiresGridsScreen extends Composite implements ISelectionManager {
                 grid1.setMerged( chkShowMerged.getValue() );
                 grid2.setMerged( chkShowMerged.getValue() );
                 grid3.setMerged( chkShowMerged.getValue() );
-                gridLayer.draw();
+                gridLayer.batch();
             }
         } );
 

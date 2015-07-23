@@ -87,7 +87,7 @@ public class GridWidgetMouseDownHandler<W extends IBaseGridWidget<?, M, ?>, M ex
                 .setX( gridWidget.getX() + highlightOffsetX )
                 .setY( gridWidget.getY() );
         layer.add( state.getEventColumnHighlight() );
-        layer.getLayer().draw();
+        layer.getLayer().batch();
     }
 
 }

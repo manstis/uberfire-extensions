@@ -50,7 +50,7 @@ public class GridWidgetMouseUpHandler<W extends IBaseGridWidget<?, M, ?>, M exte
             case COLUMN_MOVE:
                 //Clean-up the GridWidgetColumnProxy
                 layer.remove( state.getEventColumnHighlight() );
-                layer.draw();
+                layer.batch();
         }
 
         //Reset state

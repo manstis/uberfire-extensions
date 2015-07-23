@@ -119,7 +119,7 @@ public class CheckBoxDOMElement extends BaseDOMElement<Boolean, CheckBox> {
             gridWidget.getModel().setCell( rowIndex,
                                            columnIndex,
                                            new BaseGridCellValue<Boolean>( value ) );
-            gridLayer.draw( command );
+            gridLayer.batch( command );
 
         } else {
             command.execute();

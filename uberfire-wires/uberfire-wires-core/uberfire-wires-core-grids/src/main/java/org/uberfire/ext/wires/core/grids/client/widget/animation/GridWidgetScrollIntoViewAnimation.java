@@ -100,7 +100,7 @@ public class GridWidgetScrollIntoViewAnimation extends TimedAnimation {
                        transform.translate( delta.getX(),
                                             delta.getY() );
 
-                       gridWidget.getLayer().draw();
+                       gridWidget.getLayer().batch();
                    }
 
                    @Override
@@ -110,7 +110,6 @@ public class GridWidgetScrollIntoViewAnimation extends TimedAnimation {
 
                        gridWidget.getLayer().setListening( true );
                        gridWidget.getLayer().batch();
-                       gridWidget.getLayer().draw();
                    }
 
                    private Point2D getViewportTranslation() {

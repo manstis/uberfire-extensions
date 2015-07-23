@@ -110,7 +110,7 @@ public class MergableGridWidgetMouseDoubleClickHandler extends BaseGridWidgetMou
                              gridWidget.getModel().setCell( rowIndex,
                                                             columnIndex,
                                                             value );
-                             gridWidget.getLayer().draw();
+                             gridWidget.getLayer().batch();
                          }
                      } );
     }

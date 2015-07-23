@@ -42,7 +42,6 @@ import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Transform;
 import com.ait.lienzo.shared.core.types.ArrowType;
 import com.ait.lienzo.shared.core.types.ColorName;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Command;
 import org.uberfire.ext.wires.core.grids.client.model.IGridColumn;
 import org.uberfire.ext.wires.core.grids.client.model.IGridData;
@@ -149,28 +148,6 @@ public class GridLayer extends Layer implements ISelectionManager,
         return null;
     }
 
-    /**
-     * Schedule a draw with out additional command.
-     */
-    @Override
-    public void draw() {
-        draw( NOP_COMMAND );
-    }
-
-    public native void requestAnimationFrame( final Command command ) /*-{
-        var that = this;
-        $wnd.requestAnimationFrame(function () {
-            that.@org.uberfire.ext.wires.core.grids.client.widget.layer.GridLayer::doDraw(Lcom/google/gwt/user/client/Command;)(command);
-        });
-    }-*/;
-
-    public void doDraw( final Command command ) {
-        updateBounds();
-        updateConnectors();
-        GridLayer.super.draw();
-        command.execute();
-    }
-
     private static final int PADDING = 0;
 
     private void updateBounds() {
@@ -207,23 +184,18 @@ public class GridLayer extends Layer implements ISelectionManager,
 
     }
 
-    /**
-     * Schedule a draw with a command to be executed once the draw() has completed.
-     * @param command
-     */
-    public void draw( final Command command ) {
-        if ( !isRedrawScheduled ) {
-            isRedrawScheduled = true;
-            Scheduler.get().scheduleFinally( new Command() {
+    @Override
+    public void draw() {
+        //We use Layer.batch() to ensure rendering is tied to the browser's requestAnimationFrame()
+        //however this calls back into Layer.draw() so update dependent Shapes here.
+        updateBounds();
+        updateConnectors();
+        super.draw();
+    }
 
-                @Override
-                public void execute() {
-                    requestAnimationFrame( command );
-                    isRedrawScheduled = false;
-                }
-
-            } );
-        }
+    public void batch( final Command command ) {
+        GridLayer.super.batch();
+        command.execute();
     }
 
     /**
